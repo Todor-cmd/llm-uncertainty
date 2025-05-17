@@ -15,4 +15,8 @@ dependencies:
   - pytorch
   - transformers
   - uncertainty-toolbox
+  - pip:
+      - dotenv
+      - accelerate
+      - huggingface-hub
   
