@@ -76,6 +76,7 @@ We will implement and compare different uncertainty quantification methods to:
 
 ## How to Load the Data
 The data is basically downloaded from this url: https://gitlab.com/checkthat_lab/clef2024-checkthat-lab/-/tree/main/task2/data/subtask-2-english 
+**No need to download manually if you run the code below**.
 
 To read the data, you need to run or call 'data_loader.py' and 'download_data.py'.
 1. 'data_loader.py'
@@ -90,8 +91,25 @@ llm-uncertainty/
 │ ├── download_data.py
 │ └── data/ (created automatically)
 
-### How to Use the Data Loader
+Inside data, there will be files:
+"train_en.tsv",
+"dev_en.tsv",
+"dev_test_en.tsv",
+"test_en.tsv",
+"test_en_gold.tsv"
 
+### Output/ Return
+1. calling create_dataloader(data_path, batch_size, model_name, max_length) returns torch.utils.data.DataLoader.
+2. each batch in dictionary of PyTorch tensors contains:
+    {
+    'input_ids':       tensor(batch_size, max_length), #  represent the tokenized version of the sentence
+    'attention_mask':  tensor(batch_size, max_length), #  binary mask (1s and 0s) telling the model which tokens are real and which are padding.
+    'label':           tensor(batch_size), # SUBJECTIVE = 1, OBJECTIVE = 0
+    'sentence':        list of raw strings # The original text string before tokenization
+    }
+3. use print(len(dataloader.dataset)) to know the length of the samples.
+
+### How to Use the Data Loader
 #### Basic Data Loader
 from data_loader import create_dataloader
 
@@ -106,6 +124,13 @@ for batch in dataloader: #example to show the result of dataloader
     print(batch['input_ids'].shape)
     print(batch['label'])
     break
+
+for batch in dataloader:
+    print("input_ids:", batch['input_ids'].shape)
+    print("attention_mask:", batch['attention_mask'].shape)
+    print("Sentences:", batch['sentence'])
+    print("labels:", batch['label'])
+    break    
 
 #### Show the tokenize output
 from transformers import AutoTokenizer
