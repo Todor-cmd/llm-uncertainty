@@ -78,11 +78,11 @@ We will implement and compare different uncertainty quantification methods to:
 The data is basically downloaded from this url: https://gitlab.com/checkthat_lab/clef2024-checkthat-lab/-/tree/main/task2/data/subtask-2-english 
 **No need to download manually if you run the code below**.
 
-To read the data, you need to run or call 'data_loader.py' and 'download_data.py'.
-1. 'data_loader.py'
-   --> Load data from CLEF2024-CheckThatLab (by calling 'download_data.py', in which will create a new folder in your repository to store all the csv/tsv file)
-   --> Tokenize text (using AutoTokenizer)
-2. 'download_data.py' --> no need to do anything because it is already loaded in No (1) above.
+To read the data, you need to run or call ```'data_loader.py'``` and ```'download_data.py'```.
+1. ```'data_loader.py'```
+   - --> Load data from CLEF2024-CheckThatLab (by calling 'download_data.py', in which will create a new folder in your repository to store all the csv/tsv file)
+   - --> Tokenize text (using AutoTokenizer)
+2. ```'download_data.py'``` --> no need to do anything because it is already loaded in No (1) above.
 
 Therefore, The structure will be:
 ```
@@ -93,7 +93,7 @@ llm-uncertainty/
 │ └── data/ (created automatically)
 ```
 
-Inside data, there will be files:
+Inside data, there will be 5 files:
 "train_en.tsv",
 "dev_en.tsv",
 "dev_test_en.tsv",
@@ -101,15 +101,17 @@ Inside data, there will be files:
 "test_en_gold.tsv"
 
 ### Output/ Return
-1. calling create_dataloader(data_path, batch_size, model_name, max_length) returns torch.utils.data.DataLoader.
+1. calling ```create_dataloader(data_path, batch_size, model_name, max_length)``` returns torch.utils.data.DataLoader.
 2. each batch in dictionary of PyTorch tensors contains:
+   ```
     {
     'input_ids':       tensor(batch_size, max_length), #  represent the tokenized version of the sentence
     'attention_mask':  tensor(batch_size, max_length), #  binary mask (1s and 0s) telling the model which tokens are real and which are padding.
     'label':           tensor(batch_size), # SUBJECTIVE = 1, OBJECTIVE = 0
     'sentence':        list of raw strings # The original text string before tokenization
     }
-3. use ```print(len(dataloader.dataset))``` to know the length of the samples.
+   ```
+4. use ```print(len(dataloader.dataset))``` to know the length of the samples.
 
 ### How to Use the Data Loader
 #### Basic Data Loader
