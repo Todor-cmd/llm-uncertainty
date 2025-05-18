@@ -69,7 +69,8 @@ class SubjectivityDataset(Dataset):
         return {
             'input_ids': encoding['input_ids'].squeeze(0),
             'attention_mask': encoding['attention_mask'].squeeze(0),
-            'label': torch.tensor(label, dtype=torch.long)
+            'label': torch.tensor(label, dtype=torch.long),
+            'sentence': sentence
         }
 
 def create_dataloader(data_path, batch_size=None, model_name=None, max_length=128):
