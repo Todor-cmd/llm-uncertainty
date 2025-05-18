@@ -85,11 +85,13 @@ To read the data, you need to run or call 'data_loader.py' and 'download_data.py
 2. 'download_data.py' --> no need to do anything because it is already loaded in No (1) above.
 
 Therefore, The structure will be:
+```
 llm-uncertainty/
 ├── src/
 │ ├── data_loader.py
 │ ├── download_data.py
 │ └── data/ (created automatically)
+```
 
 Inside data, there will be files:
 "train_en.tsv",
@@ -107,10 +109,11 @@ Inside data, there will be files:
     'label':           tensor(batch_size), # SUBJECTIVE = 1, OBJECTIVE = 0
     'sentence':        list of raw strings # The original text string before tokenization
     }
-3. use print(len(dataloader.dataset)) to know the length of the samples.
+3. use ```print(len(dataloader.dataset))``` to know the length of the samples.
 
 ### How to Use the Data Loader
 #### Basic Data Loader
+```
 from data_loader import create_dataloader
 
 dataloader = create_dataloader(
@@ -131,8 +134,9 @@ for batch in dataloader:
     print("Sentences:", batch['sentence'])
     print("labels:", batch['label'])
     break    
-
+```
 #### Show the tokenize output
+```
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
@@ -140,3 +144,4 @@ tokens = tokenizer.convert_ids_to_tokens(batch['input_ids'][0])
 decoded = tokenizer.decode(batch['input_ids'][0])
 print("Tokens:", tokens)
 print("Decoded:", decoded)
+```
