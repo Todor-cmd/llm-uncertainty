@@ -125,17 +125,15 @@ dataloader = create_dataloader(
     max_length=128                   # default is 128
 )
 
-for batch in dataloader: #example to show the result of dataloader
-    print(batch['input_ids'].shape)
-    print(batch['label'])
-    break
+#example to show the result of dataloader
+batch = next(iter(dataloader))  # get first batch
 
-for batch in dataloader:
-    print("input_ids:", batch['input_ids'].shape)
-    print("attention_mask:", batch['attention_mask'].shape)
-    print("Sentences:", batch['sentence'])
-    print("labels:", batch['label'])
-    break    
+for i in range(len(batch['input_ids'])):
+    print(f"\n SAMPLE {i+1}")
+    print("Sentence:", batch['sentence'][i])
+    print("Label:", batch['label'][i].item())
+    print("Input IDs:", batch['input_ids'][i].tolist())
+    print("Attention Mask:", batch['attention_mask'][i].tolist()) 
 ```
 #### Show the tokenize output
 ```
