@@ -73,3 +73,45 @@ We will implement and compare different uncertainty quantification methods to:
 3. Uncertainty Quantification
 4. Sample Analysis
 5. Technique Evaluation
+
+## How to Load the Data
+The data is basically downloaded from this url: https://gitlab.com/checkthat_lab/clef2024-checkthat-lab/-/tree/main/task2/data/subtask-2-english 
+
+To read the data, you need to run or call 'data_loader.py' and 'download_data.py'.
+1. 'data_loader.py'
+   --> Load data from CLEF2024-CheckThatLab (by calling 'download_data.py', in which will create a new folder in your repository to store all the csv/tsv file)
+   --> Tokenize text (using AutoTokenizer)
+2. 'download_data.py' --> no need to do anything because it is already loaded in No (1) above.
+
+Therefore, The structure will be:
+llm-uncertainty/
+├── src/
+│ ├── data_loader.py
+│ ├── download_data.py
+│ └── data/ (created automatically)
+
+### How to Use the Data Loader
+
+#### Basic Data Loader
+from data_loader import create_dataloader
+
+dataloader = create_dataloader(
+    data_path="src/data/train_en.tsv", #location of the tsv
+    batch_size=8, #no of rows/ batch
+    model_name="bert-base-uncased",  # model name for tokenize
+    max_length=128                   # default is 128
+)
+
+for batch in dataloader: #example to show the result of dataloader
+    print(batch['input_ids'].shape)
+    print(batch['label'])
+    break
+
+#### Show the tokenize output
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+tokens = tokenizer.convert_ids_to_tokens(batch['input_ids'][0])
+decoded = tokenizer.decode(batch['input_ids'][0])
+print("Tokens:", tokens)
+print("Decoded:", decoded)
