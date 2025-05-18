@@ -90,10 +90,10 @@ llm-uncertainty/
 ├── src/
 │ ├── data_loader.py
 │ ├── download_data.py
-│ └── data/ (created automatically)
+│ └── data/ **(created automatically)**
 ```
 
-Inside data, there will be 5 files:
+Inside data folder, there will be 5 files:
 "train_en.tsv",
 "dev_en.tsv",
 "dev_test_en.tsv",
