@@ -1,12 +1,7 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-
-## import dotenv and load environment variables
-from dotenv import load_dotenv
-load_dotenv()
-
 import os
-os.environ["huggingface_token"] = os.getenv("huggingface_token")
+from pathlib import Path
 
 class ModelInferenceWrapper:
     """
@@ -17,57 +12,175 @@ class ModelInferenceWrapper:
         Initialize model and tokenizer for inference
         
         Args:
-            model_path (str): Hugging Face model identifier or path
+            model_path (str): Local path to the downloaded model
             torch_dtype: Torch data type for model weights
             device_map: Device mapping for model
         """
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        # Verify the model path exists
+        if not Path(model_path).exists():
+            raise FileNotFoundError(f"Model path does not exist: {model_path}")
+        
+        print(f"Loading model from: {model_path}")
+        
+        # Load tokenizer and model from local files only
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_path,
+            local_files_only=True,
+            trust_remote_code=False  # For security in offline environments
+        )
+        
+        # Set pad_token if it doesn't exist
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             torch_dtype=torch_dtype,
-            device_map=device_map
+            device_map=device_map,
+            local_files_only=True,
+            trust_remote_code=False  # For security in offline environments
         )
+        
+        print(f"✓ Successfully loaded model and tokenizer")
 
-    def generate_with_token_probs(self, prompt, max_length=100):
+    def generate_with_token_probs(self, prompt, max_new_tokens=50):
         """
         Generate output and extract token probabilities
         
         Args:
             prompt (str): Input prompt for the model
-            max_length (int): Maximum length of generated sequence
+            max_new_tokens (int): Maximum number of new tokens to generate
         
         Returns:
-            list: List of (token, probability) tuples
+            tuple: (generated_text, list of (token, probability) tuples)
         """
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-        outputs = self.model.generate(
-            **inputs,
-            max_length=max_length,
-            do_sample=False,
-            return_dict_in_generate=True,
-            output_scores=True
-        )
+        input_length = inputs.input_ids.shape[1]
+        
+        with torch.no_grad():  # Save memory during inference
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,  # Use max_new_tokens instead of max_length
+                do_sample=True,  # Enable sampling for more diverse output
+                temperature=0.7,  # Add some randomness
+                top_p=0.9,  # Nucleus sampling
+                return_dict_in_generate=True,
+                output_scores=True,
+                pad_token_id=self.tokenizer.pad_token_id
+            )
+        
+        # Extract generated tokens (excluding input tokens)
+        generated_sequence = outputs.sequences[0]
+        generated_tokens = generated_sequence[input_length:]  # Only new tokens
         scores = outputs.scores
-        tokens = outputs.sequences[0][inputs.input_ids.shape[1]:]
+        
         token_probs = []
-        for i, token in enumerate(tokens):
+        
+        for i, token_id in enumerate(generated_tokens):
             if i < len(scores):
+                # Get probabilities for this position
                 probs = torch.nn.functional.softmax(scores[i][0], dim=0)
-                token_prob = probs[token].item()
-                token_probs.append((self.tokenizer.decode(token), token_prob))
-        return token_probs
+                token_prob = probs[token_id].item()
+                
+                # Decode the token properly
+                decoded_token = self.tokenizer.decode([token_id], skip_special_tokens=False)
+                token_probs.append((decoded_token, token_prob))
+            else:
+                # If we don't have scores for this token, still decode it
+                decoded_token = self.tokenizer.decode([token_id], skip_special_tokens=False)
+                token_probs.append((decoded_token, 0.0))
+        
+        # Generate the full text for verification
+        generated_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+        
+        return generated_text, token_probs
+
+def check_model_files(model_path):
+    """
+    Check if all required model files exist in the local directory
+    """
+    required_files = [
+        "config.json",
+        "tokenizer_config.json"
+    ]
     
+    path = Path(model_path)
+    missing_files = []
+    
+    for file in required_files:
+        if not (path / file).exists():
+            missing_files.append(file)
+    
+    # Check for model weight files (.safetensors or .bin)
+    weight_files = list(path.glob("*.safetensors")) + list(path.glob("*.bin"))
+    if not weight_files:
+        missing_files.append("model weight files (.safetensors or .bin)")
+    
+    if missing_files:
+        print(f"❌ Missing files in {model_path}: {missing_files}")
+        return False
+    else:
+        print(f"✓ All required files found in {model_path}")
+        return True
+
+# Define your local model paths
 models = {
-    "meta-llama/Llama-3.1-8B": "meta-llama/Llama-3.1-8B-Instruct",
-    # "mistralai/Mistral-7B": "models/mistralai/Mistral-7B-Instruct-v0.2",
-    # "google/gemma-7b": "models/google/gemma-7b-it", 
-    # "microsoft/Phi-3-mini-4k": "models/microsoft/Phi-3-mini-4k-instruct"
+    # "meta-llama/Llama-3.1-8B": "/src/data/models/Llama-3.1-8B-Instruct",
+    "distilgpt2": "src/data/models/distilgpt2",
+    # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
+    # "google/gemma-7b": "./models/google/gemma-7b-it", 
+    # "microsoft/Phi-3-mini-4k": "./models/microsoft/Phi-3-mini-4k-instruct"
 }
 
-results = {}
-prompt = "Translate the following English to French: 'The cat is on the table.'"
-
+# Check if models exist before running inference
+print("Checking for model files...")
+available_models = {}
 for model_name, model_path in models.items():
-    wrapper = ModelInferenceWrapper(model_path)
-    token_probs = wrapper.generate_with_token_probs(prompt)
-    results[model_name] = token_probs
+    if check_model_files(model_path):
+        available_models[model_name] = model_path
+
+if not available_models:
+    print("❌ No valid models found. Please download models first.")
+    exit(1)
+
+# Run inference on available models
+results = {}
+prompt = "Hello! How are you today? I am"
+
+for model_name, model_path in available_models.items():
+    try:
+        print(f"\n{'='*50}")
+        print(f"Processing: {model_name}")
+        print(f"{'='*50}")
+        
+        wrapper = ModelInferenceWrapper(model_path)
+        
+        # Then run the main generation
+        print("\nRunning main generation...")
+        generated_text, token_probs = wrapper.generate_with_token_probs(prompt, max_new_tokens=20)
+        results[model_name] = (generated_text, token_probs)
+        
+        print(f"✓ Successfully processed {model_name}")
+        print(f"Generated text: '{generated_text}'")
+        
+        # Print first few tokens and their probabilities
+        print("First 5 generated tokens:")
+        for i, (token, prob) in enumerate(token_probs[:5]):
+            print(f"  {i+1}. '{token}' (repr: {repr(token)}): {prob:.4f}")
+            
+    except Exception as e:
+        print(f"❌ Failed to process {model_name}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
+# Print full results
+print(f"\n{'='*50}")
+print("FINAL RESULTS")
+print(f"{'='*50}")
+
+for model_name, (generated_text, token_probs) in results.items():
+    print(f"\n{model_name}:")
+    print(f"Generated: '{generated_text}'")
+    print("Token probabilities:")
+    for token, prob in token_probs:
+        print(f"  '{token}' (repr: {repr(token)}): {prob:.4f}")
