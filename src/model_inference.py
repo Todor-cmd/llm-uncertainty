@@ -126,7 +126,7 @@ def check_model_files(model_path):
 # Define your local model paths
 models = {
     # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-    "distilgpt2": "src/data/models/distilgpt2",
+    "distilgpt2": "models/distilgpt2",
     # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
     # "google/gemma-7b": "./models/google/gemma-7b-it", 
     # "microsoft/Phi-3-mini-4k": "./models/microsoft/Phi-3-mini-4k-instruct"
