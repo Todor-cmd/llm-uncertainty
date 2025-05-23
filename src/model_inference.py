@@ -60,10 +60,10 @@ class ModelInferenceWrapper:
         with torch.no_grad():  # Save memory during inference
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens=max_new_tokens,  # Use max_new_tokens instead of max_length
-                do_sample=True,  # Enable sampling for more diverse output
-                temperature=0.7,  # Add some randomness
-                top_p=0.9,  # Nucleus sampling
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=0.7, ## should consider this hyperparameter
+                top_p=0.9,  ## should consider this hyperparameter
                 return_dict_in_generate=True,
                 output_scores=True,
                 pad_token_id=self.tokenizer.pad_token_id
@@ -125,7 +125,7 @@ def check_model_files(model_path):
 
 # Define your local model paths
 models = {
-    # "meta-llama/Llama-3.1-8B": "/src/data/models/Llama-3.1-8B-Instruct",
+    # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
     "distilgpt2": "src/data/models/distilgpt2",
     # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
     # "google/gemma-7b": "./models/google/gemma-7b-it", 
@@ -159,14 +159,6 @@ for model_name, model_path in available_models.items():
         print("\nRunning main generation...")
         generated_text, token_probs = wrapper.generate_with_token_probs(prompt, max_new_tokens=20)
         results[model_name] = (generated_text, token_probs)
-        
-        print(f"✓ Successfully processed {model_name}")
-        print(f"Generated text: '{generated_text}'")
-        
-        # Print first few tokens and their probabilities
-        print("First 5 generated tokens:")
-        for i, (token, prob) in enumerate(token_probs[:5]):
-            print(f"  {i+1}. '{token}' (repr: {repr(token)}): {prob:.4f}")
             
     except Exception as e:
         print(f"❌ Failed to process {model_name}: {str(e)}")
