@@ -33,6 +33,8 @@ class SubjectivityDataset(Dataset):
 
         # Tokenizer and sequence config
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
         self.max_length = max_length
     
     def __len__(self):

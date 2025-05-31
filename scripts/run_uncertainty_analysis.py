@@ -13,6 +13,7 @@ from src.models.semantic_entropy import SemanticEntropy
 from src.models.lexical_similarity import LexicalSimilarity
 from src.models.vae import VAEUncertainty
 from src.evaluation import UncertaintyEvaluator
+from tqdm import tqdm
 
 def run_uncertainty_analysis(
     model_name: str = "distilgpt2", 
@@ -48,7 +49,7 @@ def run_uncertainty_analysis(
     )
     
     # Initialize model wrapper
-    model_wrapper = ModelInferenceWrapper(f"./src/models/{model_name}")
+    model_wrapper = ModelInferenceWrapper(f"./models/{model_name}")
     
     # Initialize selected uncertainty technique
     if uncertainty_metric == "predictive_entropy":
@@ -68,10 +69,11 @@ def run_uncertainty_analysis(
     print(f"Performing model inference and {uncertainty_metric} analysis...")
     results = []
     
-    for batch in dataloader:
+    
+    for batch in tqdm(dataloader, desc="Processing batches"):
         texts = batch['sentence']
         with torch.no_grad():
-            for text in texts:
+            for text in tqdm(texts, desc="Processing texts", leave=False):
                 # Get model outputs with probabilities
                 generated_text, token_probs = model_wrapper.generate_with_token_probs(text)
                 
@@ -126,6 +128,6 @@ if __name__ == '__main__':
     # Example usage for different uncertainty metrics
     run_uncertainty_analysis(
         model_name="distilgpt2",
-        data_path="data/test_data.json",
+        data_path="src/data/test_en_gold.tsv",
         uncertainty_metric="predictive_entropy"  # Try different metrics: "semantic_entropy", "lexical_similarity", "vae"
     )

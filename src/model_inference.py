@@ -1,3 +1,4 @@
+import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
@@ -123,56 +124,70 @@ def check_model_files(model_path):
         print(f"✓ All required files found in {model_path}")
         return True
 
-# Define your local model paths
-models = {
-    # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-    "distilgpt2": "models/distilgpt2",
-    # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
-    # "google/gemma-7b": "./models/google/gemma-7b-it", 
-    # "microsoft/Phi-3-mini-4k": "./models/microsoft/Phi-3-mini-4k-instruct"
-}
 
-# Check if models exist before running inference
-print("Checking for model files...")
-available_models = {}
-for model_name, model_path in models.items():
-    if check_model_files(model_path):
-        available_models[model_name] = model_path
+if __name__ == "__main__":
+    # Define your local model paths
+    models = {
+        # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
+        "distilgpt2": "models/distilgpt2",
+        # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
+        # "google/gemma-7b": "./models/google/gemma-7b-it", 
+        # "microsoft/Phi-3-mini-4k": "./models/microsoft/Phi-3-mini-4k-instruct"
+    }
 
-if not available_models:
-    print("❌ No valid models found. Please download models first.")
-    exit(1)
+    # Check if models exist before running inference
+    print("Checking for model files...")
 
-# Run inference on available models
-results = {}
-prompt = "Hello! How are you today? I am"
+    start_check = time.time()
 
-for model_name, model_path in available_models.items():
-    try:
-        print(f"\n{'='*50}")
-        print(f"Processing: {model_name}")
-        print(f"{'='*50}")
-        
-        wrapper = ModelInferenceWrapper(model_path)
-        
-        # Then run the main generation
-        print("\nRunning main generation...")
-        generated_text, token_probs = wrapper.generate_with_token_probs(prompt, max_new_tokens=20)
-        results[model_name] = (generated_text, token_probs)
+    available_models = {}
+    for model_name, model_path in models.items():
+        if check_model_files(model_path):
+            available_models[model_name] = model_path
+
+    end_check = time.time()
+    print(f"Model file check took {end_check - start_check:.2f} seconds.")
+
+    if not available_models:
+        print("❌ No valid models found. Please download models first.")
+        exit(1)
+
+    # Run inference on available models
+    results = {}
+    prompt = "Hello! How are you today? I am"
+
+    for model_name, model_path in available_models.items():
+        try:
+            print(f"\n{'='*50}")
+            print(f"Processing: {model_name}")
+            print(f"{'='*50}")
             
-    except Exception as e:
-        print(f"❌ Failed to process {model_name}: {str(e)}")
-        import traceback
-        traceback.print_exc()
+            load_start = time.time()
+            wrapper = ModelInferenceWrapper(model_path)
+            load_end = time.time()
+            print(f"Model load time: {load_end - load_start:.2f} seconds")
+            
+            # Then run the main generation
+            print("\nRunning main generation...")
+            gen_start = time.time()
+            generated_text, token_probs = wrapper.generate_with_token_probs(prompt, max_new_tokens=20)
+            gen_end = time.time()
+            print(f"Generation time: {gen_end - gen_start:.2f} seconds")
+            results[model_name] = (generated_text, token_probs)
+                
+        except Exception as e:
+            print(f"❌ Failed to process {model_name}: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
-# Print full results
-print(f"\n{'='*50}")
-print("FINAL RESULTS")
-print(f"{'='*50}")
+    # Print full results
+    print(f"\n{'='*50}")
+    print("FINAL RESULTS")
+    print(f"{'='*50}")
 
-for model_name, (generated_text, token_probs) in results.items():
-    print(f"\n{model_name}:")
-    print(f"Generated: '{generated_text}'")
-    print("Token probabilities:")
-    for token, prob in token_probs:
-        print(f"  '{token}' (repr: {repr(token)}): {prob:.4f}")
+    for model_name, (generated_text, token_probs) in results.items():
+        print(f"\n{model_name}:")
+        print(f"Generated: '{generated_text}'")
+        print("Token probabilities:")
+        for token, prob in token_probs:
+            print(f"  '{token}' (repr: {repr(token)}): {prob:.4f}")
