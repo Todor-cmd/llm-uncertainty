@@ -3,25 +3,21 @@ import subprocess
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer
 
 class SubjectivityDataset(Dataset):
     """
-    Dataset class for loading and preprocessing subjectivity classification data
+    Dataset class for loading subjectivity classification data
     
     Responsibilities:
     - Load data from CSV
-    - Tokenize text
-    - Prepare inputs for model inference
+    - Provide raw text and labels for generative inference
     """
-    def __init__(self, csv_path, model_name=None, max_length=None):
+    def __init__(self, csv_path):
         """
-        Initialize dataset with configuration parameters
+        Initialize dataset
         
         Args:
             csv_path (str): Path to input CSV file
-            model_name (str, optional): Tokenizer model name
-            max_length (int, optional): Maximum sequence length
         """
         # Run downloader if data directory is missing
         if not os.path.exists("src/data"):
@@ -30,12 +26,6 @@ class SubjectivityDataset(Dataset):
 
         # Load data
         self.data = pd.read_csv(csv_path, sep='\t')
-
-        # Tokenizer and sequence config
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-        self.max_length = max_length
     
     def __len__(self):
         """
@@ -48,47 +38,34 @@ class SubjectivityDataset(Dataset):
     
     def __getitem__(self, idx):
         """
-        Prepare and return a single data sample
+        Return a single data sample
         
         Args:
             idx (int): Index of the sample
         
         Returns:
-            dict: Processed sample with tokenized inputs, text, and label
+            dict: Sample with raw sentence and label
         """
         row = self.data.iloc[idx]
         sentence = row['sentence']
         label = 1 if row['label'] == 'SUBJ' else 0
 
-        encoding = self.tokenizer(
-            sentence,
-            truncation=True,
-            padding='max_length',
-            max_length=self.max_length,
-            return_tensors='pt'
-        )
-
         return {
-            'input_ids': encoding['input_ids'].squeeze(0),
-            'attention_mask': encoding['attention_mask'].squeeze(0),
-            'label': torch.tensor(label, dtype=torch.long),
-            'sentence': sentence
+            'sentence': sentence,
+            'label': label
         }
 
-def create_dataloader(data_path, batch_size=None, model_name=None, max_length=128):
+def create_dataloader(data_path, batch_size=None, shuffle=True):
     """
-    Create a DataLoader for model inference
+    Create a DataLoader for generative inference
     
     Args:
         data_path (str): Path to input data
         batch_size (int, optional): Batch size for inference
+        shuffle (bool): Whether to shuffle the data
     
     Returns:
         DataLoader: Configured data loader
     """
-    dataset = SubjectivityDataset(
-        csv_path=data_path,
-        model_name=model_name,
-        max_length=max_length
-    )
-    return DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    dataset = SubjectivityDataset(csv_path=data_path)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)

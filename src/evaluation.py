@@ -3,7 +3,7 @@ import os
 import uncertainty_toolbox as uct
 from pprint import pprint
 import numpy as np
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, brier_score_loss
 
 class UncertaintyEvaluator:
     """
@@ -79,8 +79,8 @@ class UncertaintyEvaluator:
             output_dir=output_dir
         )
     
-    # TODO: Choose only the most relevant metrics. E.g. Brier score and Miscalibration Area. Maybe make a sharpness vs calibration plot
-    def uncertainty_toolbox_evaluations(self):
+    
+    def uncertainty_evaluation_of_std_deviation_prediction(self):
         """
         Calculate uncertainty metrics using uncertainty_toolbox.
 
@@ -102,16 +102,43 @@ class UncertaintyEvaluator:
 
         return metrics_serializable # Return the serializable version
     
-    def correctness_uncertainty_auroc(self):
-        """
-        Calculate AUROC score between prediction correctness and uncertainty.
+    def correctness_uncertainty_auroc(self, top_k : int = None, bottom_k : int = None):
 
-        Returns:
-            float: AUROC score indicating how well uncertainties predict errors
-        """
-        is_incorrect = (self.predictions != self.labels).astype(int)
+        if top_k is not None and bottom_k is not None:
+            print ("You cannot set both top_k and bottom_k")
+            return 
+        
+        elif top_k is not None:
+            top_k_indices = np.argsort(self.uncertainties)[-top_k:]
+            is_incorrect = (self.predictions[top_k_indices] != self.labels[top_k_indices]).astype(int)
+            uncertainties = self.uncertainties[top_k_indices]
+        elif bottom_k is not None:
+            bottom_k_indices = np.argsort(self.uncertainties)[:bottom_k]
+            is_incorrect = (self.predictions[bottom_k_indices] != self.labels[bottom_k_indices]).astype(int)
+            uncertainties = self.uncertainties[bottom_k_indices]
+        else:
+            is_incorrect = (self.predictions != self.labels).astype(int)
+            uncertainties = self.uncertainties
 
-        return roc_auc_score(is_incorrect, self.uncertainties)
+        return roc_auc_score(is_incorrect, uncertainties)
+
+    def brier_score(self, top_k : int = None, bottom_k : int = None):
+        if top_k is not None and bottom_k is not None:
+            print ("You cannot set both top_k and bottom_k")
+            return 
+        elif top_k is not None:
+            top_k_indices = np.argsort(self.uncertainties)[-top_k:]
+            labels = self.labels[top_k_indices]
+            uncertainties = self.uncertainties[top_k_indices]
+        elif bottom_k is not None:
+            bottom_k_indices = np.argsort(self.uncertainties)[:bottom_k]
+            labels = self.labels[bottom_k_indices]
+            uncertainties = self.uncertainties[bottom_k_indices]
+        else:
+            labels = self.labels
+            uncertainties = self.uncertainties
+
+        return brier_score_loss(labels, uncertainties)
     
     def evaluate(self):
         """
@@ -122,9 +149,10 @@ class UncertaintyEvaluator:
         Returns:
             dict: Dictionary containing all computed metrics
         """
-        metrics = self.uncertainty_toolbox_evaluations()
-        auroc =self.correctness_uncertainty_auroc()
+        metrics = {}
 
+        metrics['uncertainty_toolbox_metrics'] = self.uncertainty_evaluation_of_std_deviation_prediction()
+        auroc = self.correctness_uncertainty_auroc()
         # Add auroc to metrics
         metrics['auroc'] = float(auroc)
 
