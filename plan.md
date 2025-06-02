@@ -7,11 +7,14 @@
 
 
 
-### Bendik and Madalina
+### Bendik
 1. Ensure a setup with open-source model can run
 2. Run subjectivity classification with open-source model
-3. Finish repective UQ implementations
 ----- Meeting with TA ------
+
+
+### Madalina
+1. Figure out creation of semantically similar samples
 
 ### Fahmi
 1. Implement script to get gpt-mini to inject numerics into first 100 sample texts from dataset
