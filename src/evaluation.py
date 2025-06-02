@@ -1,9 +1,6 @@
-import json
-import os
-import uncertainty_toolbox as uct
-from pprint import pprint
 import numpy as np
 from sklearn.metrics import roc_auc_score, brier_score_loss
+import uncertainty_toolbox as uct
 
 class UncertaintyEvaluator:
     """
@@ -17,10 +14,9 @@ class UncertaintyEvaluator:
         predictions (np.ndarray): Model predictions
         uncertainties (np.ndarray): Uncertainty estimates for each prediction
         labels (np.ndarray): Ground truth labels
-        output_dir (str): Directory to save evaluation results
     """
 
-    def __init__(self, predictions, uncertainties, labels, output_dir):
+    def __init__(self, predictions, uncertainties, labels):
         """
         Initialize the UncertaintyEvaluator.
 
@@ -28,43 +24,35 @@ class UncertaintyEvaluator:
             predictions: Model predictions
             uncertainties: Uncertainty estimates for each prediction
             labels: Ground truth labels
-            output_dir: Directory to save evaluation results
         """
         self.predictions = predictions
         self.uncertainties = uncertainties
         self.labels = labels
-        self.output_dir = output_dir
-
-        os.makedirs(self.output_dir, exist_ok=True)
-        
 
     @classmethod
-    def from_arrays(cls, predictions : np.ndarray, uncertainties : np.ndarray, labels : np.ndarray, output_dir : str):
+    def from_arrays(cls, predictions: np.ndarray, uncertainties: np.ndarray, labels: np.ndarray):
         """
         Initialize directly from numpy arrays.
 
         Args:
             predictions (np.ndarray): Model predictions
             uncertainties (np.ndarray): Uncertainty estimates
-            labels (np.ndarray): Ground truth labels  
-            output_dir (str): Directory to save results
+            labels (np.ndarray): Ground truth labels
 
         Returns:
             UncertaintyEvaluator: New evaluator instance
         """
         return cls(predictions=predictions,
                   uncertainties=uncertainties,
-                  labels=labels,
-                  output_dir=output_dir)
+                  labels=labels)
 
     @classmethod
-    def from_json(cls, json_path : str, output_dir : str):
+    def from_json(cls, json_path: str):
         """
         Initialize from a JSON file containing predictions, uncertainties and labels.
 
         Args:
             json_path (str): Path to JSON file containing the data
-            output_dir (str): Directory to save results
 
         Returns:
             UncertaintyEvaluator: New evaluator instance
@@ -75,11 +63,9 @@ class UncertaintyEvaluator:
         return cls(
             predictions=np.array(data['predictions']),
             uncertainties=np.array(data['uncertainties']),
-            labels=np.array(data['labels']),
-            output_dir=output_dir
+            labels=np.array(data['labels'])
         )
-    
-    
+
     def uncertainty_evaluation_of_std_deviation_prediction(self):
         """
         Calculate uncertainty metrics using uncertainty_toolbox.
@@ -89,10 +75,10 @@ class UncertaintyEvaluator:
         """
         # Get metrics from uncertainty_toolbox
         # Setting verbose to False from uct.metrics.get_all_metrics
-        # as the printing is extensive and we are saving to file.
+        # as the printing is extensive
         metrics = uct.metrics.get_all_metrics(
-            self.predictions, 
-            self.uncertainties, 
+            self.predictions,
+            self.uncertainties,
             self.labels,
             verbose=False  # Set to True if you want uct to print its detailed output
         )
@@ -100,14 +86,14 @@ class UncertaintyEvaluator:
         # Convert numpy types in metrics to JSON serializable types
         metrics_serializable = self._make_serializable_recursive(metrics)
 
-        return metrics_serializable # Return the serializable version
-    
-    def correctness_uncertainty_auroc(self, top_k : int = None, bottom_k : int = None):
+        return metrics_serializable  # Return the serializable version
+
+    def correctness_uncertainty_auroc(self, top_k: int = None, bottom_k: int = None):
 
         if top_k is not None and bottom_k is not None:
-            print ("You cannot set both top_k and bottom_k")
-            return 
-        
+            print("You cannot set both top_k and bottom_k")
+            return
+
         elif top_k is not None:
             top_k_indices = np.argsort(self.uncertainties)[-top_k:]
             is_incorrect = (self.predictions[top_k_indices] != self.labels[top_k_indices]).astype(int)
@@ -122,10 +108,10 @@ class UncertaintyEvaluator:
 
         return roc_auc_score(is_incorrect, uncertainties)
 
-    def brier_score(self, top_k : int = None, bottom_k : int = None):
+    def brier_score(self, top_k: int = None, bottom_k: int = None):
         if top_k is not None and bottom_k is not None:
-            print ("You cannot set both top_k and bottom_k")
-            return 
+            print("You cannot set both top_k and bottom_k")
+            return
         elif top_k is not None:
             top_k_indices = np.argsort(self.uncertainties)[-top_k:]
             labels = self.labels[top_k_indices]
@@ -139,12 +125,12 @@ class UncertaintyEvaluator:
             uncertainties = self.uncertainties
 
         return brier_score_loss(labels, uncertainties)
-    
+
     def evaluate(self):
         """
-        Run full evaluation and save results.
+        Run full evaluation.
 
-        Computes all uncertainty metrics and saves them to a JSON file.
+        Computes all uncertainty metrics.
 
         Returns:
             dict: Dictionary containing all computed metrics
@@ -156,15 +142,8 @@ class UncertaintyEvaluator:
         # Add auroc to metrics
         metrics['auroc'] = float(auroc)
 
-        # Save metrics to file
-        metrics_file_path = os.path.join(self.output_dir, 'metrics.json')
-        with open(metrics_file_path, 'w') as f:
-            json.dump(metrics, f, indent=4)
-        
-        print(f"Metrics saved to {metrics_file_path}")
-
         return metrics
-    
+
     def _make_serializable_recursive(self, item):
         if isinstance(item, np.ndarray):
             return item.tolist()
@@ -178,14 +157,13 @@ class UncertaintyEvaluator:
             return [self._make_serializable_recursive(element) for element in item]
         else:
             return item
-        
-    
+
+
 if __name__ == "__main__":
     predictions = np.array([1, 0, 1, 0, 0])
     uncertainties = np.array([0.8, 0.1, 0.5, 0.2, 0.5])
     labels = np.array([1, 0, 1, 0, 1])
-    output_dir = "results"
 
-    evaluator = UncertaintyEvaluator.from_arrays(predictions, uncertainties, labels, output_dir)
+    evaluator = UncertaintyEvaluator.from_arrays(predictions, uncertainties, labels)
     metrics = evaluator.evaluate()
-    pprint(metrics)
+    print(metrics)
