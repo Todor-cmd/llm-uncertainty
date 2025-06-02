@@ -50,6 +50,8 @@ def run_uncertainty_analysis(
     
     # Initialize model wrapper
     model_wrapper = ModelInferenceWrapper(f"./models/{model_name}")
+    # This is how it works for Mada, pls don't delete or I'll forget about it 
+    # model_wrapper = ModelInferenceWrapper(f"./src/models/{model_name}")
     
     # Initialize selected uncertainty technique
     if uncertainty_metric == "predictive_entropy":
