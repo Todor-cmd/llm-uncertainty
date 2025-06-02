@@ -9,14 +9,10 @@ from pathlib import Path
 
 def run_subjectivity_classification(
         models : dict,
-        data_path : str = "data/test_data.json", 
-        output_dir : str = "./results/subjectivity_classification",
+        data_path : str = "data/test_data.json",
         sample_repetitions : int = 10,
         samples_limit : int = 100
     ):
-
-    # Step 0: Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
 
     # Step 1: Check which models are available
     print("Checking for model files...")
@@ -45,9 +41,13 @@ def run_subjectivity_classification(
         print(f"Processing model: {model_name}")
         print(f"{'='*60}")
         
+        # Create model-specific output directory
+        output_dir = os.path.join("results", model_name)
+        os.makedirs(output_dir, exist_ok=True)
+        
         # Define file paths
-        output_file = Path(output_dir) / f"{model_name}_results.json"
-        intermediate_file = Path(output_dir) / f"{model_name}_intermediate.json"
+        output_file = os.path.join(output_dir, "subjectivity_classification.json")
+        intermediate_file = os.path.join(output_dir, "intermediate.json")
         
         try:
             # Load model
