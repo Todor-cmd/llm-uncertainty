@@ -1,10 +1,22 @@
 import time
 import torch
+import numpy as np  # Add numpy import
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import os
 from pathlib import Path
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-class ModelInferenceWrapper:
+class ModelInferenceInterface:
+    """
+    Interface for performing inference with models
+    """
+    def generate_with_token_probs(self, prompt, max_new_tokens=50):
+        pass
+
+
+class LocalModelInference(ModelInferenceInterface):
     """
     Wrapper for performing inference with pre-trained models
     """
@@ -95,17 +107,72 @@ class ModelInferenceWrapper:
         generated_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
         
         return generated_text, token_probs
+    
+class OpenAIModelInference(ModelInferenceInterface):
+    """
+    Wrapper for performing inference with OpenAI models
+    """
+    def __init__(self, model_name):
+        self.model = ChatOpenAI(model=model_name)
 
-def check_model_files(model_path):
+    def generate_with_token_probs(self, prompt, max_new_tokens=50):
+        """
+        Generate output and extract token probabilities using OpenAI's logprobs feature
+        
+        Args:
+            prompt (str): Input prompt for the model
+            max_new_tokens (int): Maximum number of new tokens to generate
+        
+        Returns:
+            tuple: (generated_text, list of (token, probability) tuples)
+        """
+        # Configure the model to return logprobs
+        model_with_logprobs = self.model.bind(
+            logprobs=True,
+            max_tokens=max_new_tokens,
+            temperature=0.7  # Match the temperature used in LocalModelInference
+        )
+        
+        # Generate response
+        response = model_with_logprobs.invoke(prompt)
+        
+        # Extract generated text
+        generated_text = response.content
+        
+        # Extract token probabilities from response metadata
+        token_probs = []
+        if "logprobs" in response.response_metadata and response.response_metadata["logprobs"]:
+            logprobs_content = response.response_metadata["logprobs"]["content"]
+            
+            for token_data in logprobs_content:
+                token = token_data["token"]
+                logprob = token_data["logprob"]
+                # Convert log probability to linear probability
+                probability = float(np.exp(logprob))  # Use numpy.exp instead of manual exponential
+                token_probs.append((token, probability))
+        
+        return generated_text, token_probs
+
+
+def check_model_build_requirements(model_name, model_init_param):
     """
     Check if all required model files exist in the local directory
     """
+    if model_name == "openai":
+         # Check if OpenAI API key is set in environment
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            print("OPENAI_API_KEY not found in environment variables")
+            return False
+        print("OPENAI_API_KEY found in environment")
+        return True
+
     required_files = [
         "config.json",
         "tokenizer_config.json"
     ]
     
-    path = Path(model_path)
+    path = Path(model_init_param)
     missing_files = []
     
     for file in required_files:
@@ -118,10 +185,10 @@ def check_model_files(model_path):
         missing_files.append("model weight files (.safetensors or .bin)")
     
     if missing_files:
-        print(f"❌ Missing files in {model_path}: {missing_files}")
+        print(f"❌ Missing files in {model_init_param}: {missing_files}")
         return False
     else:
-        print(f"✓ All required files found in {model_path}")
+        print(f"✓ All required files found in {model_init_param}")
         return True
 
 
@@ -142,7 +209,7 @@ if __name__ == "__main__":
 
     available_models = {}
     for model_name, model_path in models.items():
-        if check_model_files(model_path):
+        if check_model_build_requirements(model_path):
             available_models[model_name] = model_path
 
     end_check = time.time()
@@ -163,7 +230,7 @@ if __name__ == "__main__":
             print(f"{'='*50}")
             
             load_start = time.time()
-            wrapper = ModelInferenceWrapper(model_path)
+            wrapper = LocalModelInference(model_path)
             load_end = time.time()
             print(f"Model load time: {load_end - load_start:.2f} seconds")
             

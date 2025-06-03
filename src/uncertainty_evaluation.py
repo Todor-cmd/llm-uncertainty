@@ -2,7 +2,7 @@ from typing import List
 import os
 import numpy as np
 import json
-from src.evaluation import UncertaintyEvaluator
+from pipeline_components.evaluation import UncertaintyEvaluator
 
 uncertainty_files = ["verbalised_and_sampling_hybrid_uncertainty.npy", "sampling_uncertainty.npy", "verbalised_uncertainty.npy"]
 

@@ -15,6 +15,7 @@
 
 ### Madalina
 1. Figure out creation of semantically similar samples
+----- Meeting with TA ------
 
 ### Fahmi
 1. Implement script to get gpt-mini to inject numerics into first 100 sample texts from dataset

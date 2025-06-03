@@ -1,6 +1,6 @@
-from src.data_loader import create_dataloader
-from src.model_inference import ModelInferenceWrapper, check_model_files
-from src.prompts import subjectivity_classification_prompt
+from pipeline_components.data_loader import create_dataloader
+from pipeline_components.model_inference import ModelInferenceInterface, check_model_build_requirements, LocalModelInference, OpenAIModelInference
+from pipeline_components.prompts import subjectivity_classification_prompt
 import os
 import json
 import time
@@ -17,9 +17,9 @@ def run_subjectivity_classification(
     # Step 1: Check which models are available
     print("Checking for model files...")
     available_models = {}
-    for model_name, model_path in models.items():
-        if check_model_files(model_path):
-            available_models[model_name] = model_path
+    for model_name, model_init_param in models.items():
+        if check_model_build_requirements(model_name, model_init_param):
+            available_models[model_name] = model_init_param
     
     if not available_models:
         print("No valid models found. Please download models first.")
@@ -36,24 +36,24 @@ def run_subjectivity_classification(
         return
 
     # Step 3: Run inference for each available model
-    for model_name, model_path in available_models.items():
+    for model_name, model_init_param in available_models.items():
         print(f"\n{'='*60}")
         print(f"Processing model: {model_name}")
         print(f"{'='*60}")
         
         # Create model-specific output directory
-        output_dir = os.path.join("results", model_name)
-        os.makedirs(output_dir, exist_ok=True)
+        output_dir = Path(os.path.join("results", model_name))
+        output_dir.mkdir(parents=True, exist_ok=True)
         
         # Define file paths
-        output_file = os.path.join(output_dir, "subjectivity_classification.json")
-        intermediate_file = os.path.join(output_dir, "intermediate.json")
+        output_file = output_dir / "subjectivity_classification.json"
+        intermediate_file = output_dir / "intermediate.json"
         
         try:
             # Load model
             print("Loading model...")
             load_start = time.time()
-            wrapper = ModelInferenceWrapper(model_path)
+            wrapper = load_models(model_name, model_init_param)
             load_end = time.time()
             print(f"Model load time: {load_end - load_start:.2f} seconds")
             
@@ -126,7 +126,7 @@ def run_subjectivity_classification(
                 # Clean up intermediate file after successful final save
                 if intermediate_file.exists():
                     intermediate_file.unlink()
-                    print(f"Cleaned up intermediate file")
+                    print("Cleaned up intermediate file")
                     
             except Exception as e:
                 print(f"Error saving final results: {str(e)}")
@@ -139,15 +139,22 @@ def run_subjectivity_classification(
             traceback.print_exc()
             continue
 
+def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterface:
+    if model_name == "openai":
+        return OpenAIModelInference(model_init_param)
+    else:
+        return LocalModelInference(model_init_param)
+
 if __name__ == "__main__":
     # Define your local model paths
     models = {
-        "distilgpt2": "models/distilgpt2",
+        # "distilgpt2": "models/distilgpt2",
+        "openai": "gpt-4o-mini",
         # Add more models as needed
         # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
         # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
     }
     
     # Run the subjectivity classification
-    run_subjectivity_classification(models=models)
+    run_subjectivity_classification(models=models, samples_limit=2)
     

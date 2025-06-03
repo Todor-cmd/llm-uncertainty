@@ -15,6 +15,9 @@ dependencies:
   - pytorch
   - transformers
   - uncertainty-toolbox
+  - langchain-community
+  - langchain-openai
+  - langchain-core
   - pip:
       - dotenv
       - accelerate
