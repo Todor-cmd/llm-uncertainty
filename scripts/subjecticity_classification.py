@@ -1,5 +1,5 @@
 from src.data_loader import create_dataloader
-from src.model_inference import ModelInferenceWrapper, check_model_files
+from src.model_inference import ModelInferenceInterface, check_model_build_requirements, LocalModelInference, OpenAIModelInference
 from src.prompts import subjectivity_classification_prompt
 import os
 import json
@@ -17,9 +17,9 @@ def run_subjectivity_classification(
     # Step 1: Check which models are available
     print("Checking for model files...")
     available_models = {}
-    for model_name, model_path in models.items():
-        if check_model_files(model_path):
-            available_models[model_name] = model_path
+    for model_name, model_init_param in models.items():
+        if check_model_build_requirements(model_name, model_init_param):
+            available_models[model_name] = model_init_param
     
     if not available_models:
         print("No valid models found. Please download models first.")
@@ -36,7 +36,7 @@ def run_subjectivity_classification(
         return
 
     # Step 3: Run inference for each available model
-    for model_name, model_path in available_models.items():
+    for model_name, model_init_param in available_models.items():
         print(f"\n{'='*60}")
         print(f"Processing model: {model_name}")
         print(f"{'='*60}")
@@ -53,7 +53,7 @@ def run_subjectivity_classification(
             # Load model
             print("Loading model...")
             load_start = time.time()
-            wrapper = ModelInferenceWrapper(model_path)
+            wrapper = load_models(model_name, model_init_param)
             load_end = time.time()
             print(f"Model load time: {load_end - load_start:.2f} seconds")
             
@@ -139,10 +139,17 @@ def run_subjectivity_classification(
             traceback.print_exc()
             continue
 
+def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterface:
+    if model_name == "openai":
+        return OpenAIModelInference(model_init_param)
+    else:
+        return LocalModelInference(model_init_param)
+
 if __name__ == "__main__":
     # Define your local model paths
     models = {
-        "distilgpt2": "models/distilgpt2",
+        # "distilgpt2": "models/distilgpt2",
+        "openai": "gpt-4o-mini",
         # Add more models as needed
         # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
         # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
