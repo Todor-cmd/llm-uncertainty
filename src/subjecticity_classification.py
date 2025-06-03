@@ -6,7 +6,7 @@ import json
 import time
 import pandas as pd
 from pathlib import Path
-
+import numpy as np
 def run_subjectivity_classification(
         models : dict,
         data_path : str = "src/data/test_en_gold.tsv",
@@ -101,11 +101,14 @@ def run_subjectivity_classification(
                         }
                         
                         sample_results['repetitions'].append(repetition_result)
+
                         
                     except Exception as e:
                         print(f"Error in inference for repetition {rep}: {str(e)}")
                         continue
                 
+                avg_prediction = get_average_prediction(sample_results['repetitions'])
+                sample_results['predicted_label'] = avg_prediction
                 all_results.append(sample_results)
                 
                 # Update intermediate file every 10 samples (overwrite previous)
@@ -144,6 +147,16 @@ def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterfa
         return OpenAIModelInference(model_init_param)
     else:
         return LocalModelInference(model_init_param)
+    
+def get_average_prediction(repetitions : list) -> int:
+    # convert predictions to ints where 1 = subjective, 0 = objective
+    predictions = [1 if "subjective" in repetition['generated_text'].lower() else 0 for repetition in repetitions]
+    avg_prediction = np.mean(predictions)
+
+    if avg_prediction >= 0.5:
+        return 1
+    else:
+        return 0
 
 if __name__ == "__main__":
     # Define your local model paths
@@ -156,5 +169,5 @@ if __name__ == "__main__":
     }
     
     # Run the subjectivity classification
-    run_subjectivity_classification(models=models, samples_limit=2)
+    run_subjectivity_classification(models=models, samples_limit=1)
     

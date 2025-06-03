@@ -1,0 +1,120 @@
+[
+  {
+    "sample_idx": 0,
+    "sentence": "Blanco established himself earlier in his career working for Dr. Luke's Kasz Money Productions.",
+    "true_label": 0,
+    "repetitions": [
+      {
+        "repetition": 0,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9859336615159003
+          ]
+        ],
+        "inference_time": 0.5786430835723877
+      },
+      {
+        "repetition": 1,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9890097227566604
+          ]
+        ],
+        "inference_time": 0.4099106788635254
+      },
+      {
+        "repetition": 2,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9859336615159003
+          ]
+        ],
+        "inference_time": 0.5808713436126709
+      },
+      {
+        "repetition": 3,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9914201993355959
+          ]
+        ],
+        "inference_time": 0.5131595134735107
+      },
+      {
+        "repetition": 4,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9859336615159003
+          ]
+        ],
+        "inference_time": 0.6134123802185059
+      },
+      {
+        "repetition": 5,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9820097519454352
+          ]
+        ],
+        "inference_time": 0.5132169723510742
+      },
+      {
+        "repetition": 6,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9859336615159003
+          ]
+        ],
+        "inference_time": 0.5094149112701416
+      },
+      {
+        "repetition": 7,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9859335430652338
+          ]
+        ],
+        "inference_time": 0.5136425495147705
+      },
+      {
+        "repetition": 8,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9859335430652338
+          ]
+        ],
+        "inference_time": 0.6141929626464844
+      },
+      {
+        "repetition": 9,
+        "generated_text": "Objective",
+        "token_probs": [
+          [
+            "Objective",
+            0.9820111347729987
+          ]
+        ],
+        "inference_time": 0.4110434055328369
+      }
+    ],
+    "predicted_label": 0
+  }
+]

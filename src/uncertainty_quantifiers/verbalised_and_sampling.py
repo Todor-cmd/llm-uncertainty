@@ -1,5 +1,12 @@
 import numpy as np
 import os
+import json
+import re
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from pipeline_components.prompts import subjectivity_uncertainty_prompt
+from tqdm import tqdm
+load_dotenv()
 
 class VerbalisedQuantifier:
     """
@@ -10,13 +17,80 @@ class VerbalisedQuantifier:
     """
 
     def __init__(self, inference_results : dict, output_dir : str):
-        self.inference_results = inference_results
+        
+        self.predictions = [result['predicted_label'] for result in inference_results]
+        self.sentences = [result['sentence'] for result in inference_results]
         self.output_dir = output_dir
+
+        self.model_name = ChatOpenAI(model="gpt-4o-mini")
 
         os.makedirs(self.output_dir, exist_ok=True)
 
     def calculate_uncertainty(self):
-        pass
+        uncertainties = []
+        responses = []
+        
+        # Use tqdm for progress bar
+        for sentence, prediction in tqdm(zip(self.sentences, self.predictions), 
+                                       total=len(self.sentences), 
+                                       desc="Calculating uncertainties"):
+            
+            # Create the complete prompt
+            prompt = subjectivity_uncertainty_prompt.format(
+                sentence=sentence, 
+                proposed_answer=prediction
+            )
+            
+            response = self.model_name.invoke(prompt)
+            responses.append(response)
+
+        # Save the responses
+        with open(os.path.join(self.output_dir, "verbalised_responses.json"), "w") as f:
+            json.dump(responses, f)
+
+        for response in responses:
+            # Extract number from response content and convert to 0-1 scale
+            uncertainty_score = self._extract_number_from_text(response.content)
+            uncertainty = uncertainty_score / 100.0
+            uncertainties.append(uncertainty)
+
+        uncertainty_array = np.array(uncertainties)
+        np.save(os.path.join(self.output_dir, "verbalised_uncertainty.npy"), uncertainty_array)
+        return uncertainty_array
+    
+    def _extract_number_from_text(text):
+        """
+        Extract the first number from text, handling various formats.
+        
+        Args:
+            text (str): Text that may contain numbers
+            
+        Returns:
+            float: Extracted number, or mark as -1.0 if no number found
+        """
+        # Remove any whitespace and convert to string
+        text = str(text).strip()
+        
+        # Try to find numbers in the text using regex
+        # This pattern matches integers and decimals
+        number_pattern = r'\b\d+(?:\.\d+)?\b'
+        matches = re.findall(number_pattern, text)
+        
+        if matches:
+            # Return the first number found
+            return float(matches[0])
+        
+        # If no number found, try to extract digits only
+        digits_only = re.sub(r'[^\d.]', '', text)
+        if digits_only and digits_only != '.':
+            try:
+                return float(digits_only)
+            except ValueError:
+                pass
+        
+        # Default fallback if no number can be extracted
+        print(f"Warning: Could not extract number from '{text}', marking inalid as -1.0")
+        return -1.0
 
 class SamplingQuantifier:
     """

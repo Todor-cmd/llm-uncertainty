@@ -1,19 +1,39 @@
 #TODO: Add we should make better prompts for each task
 
 subjectivity_classification_prompt = """
-Classify the following sentence as either 'subjective' or 'objective':
+Rate the subjectivity of the following statement: "{sentence}"
 
-Sentence: {sentence}
+Your task is to classify this statement as either objective or subjective.
 
-Classification:
+Objective statements present factual information that can be verified 
+independently through evidence, data, or observation. They describe measurable 
+events, established facts, or verifiable claims without personal interpretation 
+or bias.
+
+Subjective statements express personal opinions, emotions, beliefs, interpretations,
+or value judgments. They reflect individual perspectives, preferences, or evaluations 
+that cannot be independently verified as universally true or false.
+
+Answer with either "objective" or "subjective".
 """
 
 subjectivity_uncertainty_score_prompt = """
-Calculate the uncertainty score for the following sentence:
+Statement: {sentence}
+Proposed answer: {proposed_answer}
 
-Sentence: {sentence}
+Your task is to rate the uncertainty of the proposed subjectivity classification on a score 
+from 0 to 100, where 0 represents definitely uncertain and 100 represents definitely certain.
 
-Uncertainty Score:
+Objective statements present factual information that can be verified 
+independently through evidence, data, or observation. They describe measurable 
+events, established facts, or verifiable claims without personal interpretation 
+or bias.
+
+Subjective statements express personal opinions, emotions, beliefs, interpretations,
+or value judgments. They reflect individual perspectives, preferences, or evaluations 
+that cannot be independently verified as universally true or false.
+
+Please, only answer with your score.
 """
 
 numeric_injection_prompt = """
