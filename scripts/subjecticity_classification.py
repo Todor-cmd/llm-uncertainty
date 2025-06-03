@@ -9,7 +9,7 @@ from pathlib import Path
 
 def run_subjectivity_classification(
         models : dict,
-        data_path : str = "data/test_data.json",
+        data_path : str = "src/data/test_en_gold.tsv",
         sample_repetitions : int = 10,
         samples_limit : int = 100
     ):
@@ -72,9 +72,9 @@ def run_subjectivity_classification(
                 print(f"Processing sample {sample_idx + 1}/{min(len(dataloader), samples_limit)}: '{sentence[:50]}...'")
                 
                 sample_results = {
-                    'sample_idx': sample_idx,
-                    'sentence': sentence,
-                    'true_label': true_label,
+                    'sample_idx': int(sample_idx),
+                    'sentence': str(sentence),
+                    'true_label': int(true_label),
                     'repetitions': []
                 }
                 
@@ -92,10 +92,12 @@ def run_subjectivity_classification(
                         rep_end = time.time()
                         
                         repetition_result = {
-                            'repetition': rep,
-                            'generated_text': generated_text,
-                            'token_probs': token_probs,
-                            'inference_time': rep_end - rep_start
+                            'repetition': int(rep),
+                            'generated_text': str(generated_text),
+                            'token_probs': [
+                                (str(token), float(prob)) for token, prob in token_probs
+                            ],
+                            'inference_time': float(rep_end - rep_start)
                         }
                         
                         sample_results['repetitions'].append(repetition_result)
