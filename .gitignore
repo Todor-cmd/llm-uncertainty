@@ -1,7 +1,5 @@
-src/models/distilgpt2
+src/models/
 src/data/
-src/__pycache__/
-src/models/__pycache__/
-scripts/__pycache__/
+*__pycache__*
 
 .env
