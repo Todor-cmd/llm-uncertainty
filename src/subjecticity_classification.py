@@ -1,6 +1,6 @@
-from src.data_loader import create_dataloader
-from src.model_inference import ModelInferenceInterface, check_model_build_requirements, LocalModelInference, OpenAIModelInference
-from src.prompts import subjectivity_classification_prompt
+from pipeline_components.data_loader import create_dataloader
+from pipeline_components.model_inference import ModelInferenceInterface, check_model_build_requirements, LocalModelInference, OpenAIModelInference
+from pipeline_components.prompts import subjectivity_classification_prompt
 import os
 import json
 import time
@@ -42,12 +42,12 @@ def run_subjectivity_classification(
         print(f"{'='*60}")
         
         # Create model-specific output directory
-        output_dir = os.path.join("results", model_name)
-        os.makedirs(output_dir, exist_ok=True)
+        output_dir = Path(os.path.join("results", model_name))
+        output_dir.mkdir(parents=True, exist_ok=True)
         
         # Define file paths
-        output_file = os.path.join(output_dir, "subjectivity_classification.json")
-        intermediate_file = os.path.join(output_dir, "intermediate.json")
+        output_file = output_dir / "subjectivity_classification.json"
+        intermediate_file = output_dir / "intermediate.json"
         
         try:
             # Load model
@@ -126,7 +126,7 @@ def run_subjectivity_classification(
                 # Clean up intermediate file after successful final save
                 if intermediate_file.exists():
                     intermediate_file.unlink()
-                    print(f"Cleaned up intermediate file")
+                    print("Cleaned up intermediate file")
                     
             except Exception as e:
                 print(f"Error saving final results: {str(e)}")
@@ -156,5 +156,5 @@ if __name__ == "__main__":
     }
     
     # Run the subjectivity classification
-    run_subjectivity_classification(models=models)
+    run_subjectivity_classification(models=models, samples_limit=2)
     

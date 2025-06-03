@@ -1,6 +1,6 @@
 import json
 import os
-from src.uncertainty_quantifiers.verbalised_and_sampling import HybridVerbalisedSamplingQuantifier
+from uncertainty_quantifiers.verbalised_and_sampling import HybridVerbalisedSamplingQuantifier
 from typing import List
 def run_uncertainty_quantification(
         model_names : List[str] = ["distilgpt2"]
