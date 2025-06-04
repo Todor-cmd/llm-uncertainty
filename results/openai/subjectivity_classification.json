@@ -6,113 +6,113 @@
     "repetitions": [
       {
         "repetition": 0,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9859336615159003
+            "10",
+            0.8856632003344684
           ]
         ],
-        "inference_time": 0.5786430835723877
+        "inference_time": 0.5446124076843262
       },
       {
         "repetition": 1,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9890097227566604
+            "10",
+            0.8627860214775959
           ]
         ],
-        "inference_time": 0.4099106788635254
+        "inference_time": 0.4941082000732422
       },
       {
         "repetition": 2,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9859336615159003
+            "10",
+            0.8627860214775959
           ]
         ],
-        "inference_time": 0.5808713436126709
+        "inference_time": 0.4105079174041748
       },
       {
         "repetition": 3,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9914201993355959
+            "10",
+            0.8832217184958252
           ]
         ],
-        "inference_time": 0.5131595134735107
+        "inference_time": 0.510002613067627
       },
       {
         "repetition": 4,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9859336615159003
+            "10",
+            0.8856632003344684
           ]
         ],
-        "inference_time": 0.6134123802185059
+        "inference_time": 0.4087986946105957
       },
       {
         "repetition": 5,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9820097519454352
+            "10",
+            0.885644407421856
           ]
         ],
-        "inference_time": 0.5132169723510742
+        "inference_time": 0.41009974479675293
       },
       {
         "repetition": 6,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9859336615159003
+            "10",
+            0.8478621126153361
           ]
         ],
-        "inference_time": 0.5094149112701416
+        "inference_time": 0.37544941902160645
       },
       {
         "repetition": 7,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9859335430652338
+            "10",
+            0.8832217184958252
           ]
         ],
-        "inference_time": 0.5136425495147705
+        "inference_time": 0.4422290325164795
       },
       {
         "repetition": 8,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9859335430652338
+            "10",
+            0.8832217184958252
           ]
         ],
-        "inference_time": 0.6141929626464844
+        "inference_time": 0.5123777389526367
       },
       {
         "repetition": 9,
-        "generated_text": "Objective",
+        "generated_text": "10",
         "token_probs": [
           [
-            "Objective",
-            0.9820111347729987
+            "10",
+            0.8832217184958252
           ]
         ],
-        "inference_time": 0.4110434055328369
+        "inference_time": 0.40851855278015137
       }
     ],
     "predicted_label": 0

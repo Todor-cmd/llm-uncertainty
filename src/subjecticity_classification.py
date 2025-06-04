@@ -1,12 +1,14 @@
 from pipeline_components.data_loader import create_dataloader
 from pipeline_components.model_inference import ModelInferenceInterface, check_model_build_requirements, LocalModelInference, OpenAIModelInference
 from pipeline_components.prompts import subjectivity_classification_prompt
+from pipeline_components.number_parser import extract_number_from_text
 import os
 import json
 import time
 import pandas as pd
 from pathlib import Path
 import numpy as np
+from tqdm import tqdm
 def run_subjectivity_classification(
         models : dict,
         data_path : str = "src/data/test_en_gold.tsv",
@@ -79,7 +81,7 @@ def run_subjectivity_classification(
                 }
                 
                 # Run multiple repetitions for this sample
-                for rep in range(sample_repetitions):
+                for rep in tqdm(range(sample_repetitions), desc="Running repetitions"):
                     try:
                         # Create prompt for subjectivity classification
                         prompt = subjectivity_classification_prompt.format(sentence=sentence)
@@ -107,7 +109,7 @@ def run_subjectivity_classification(
                         print(f"Error in inference for repetition {rep}: {str(e)}")
                         continue
                 
-                avg_prediction = get_average_prediction(sample_results['repetitions'])
+                avg_prediction = get_average_prediction_numeric_prompt(sample_results['repetitions'])
                 sample_results['predicted_label'] = avg_prediction
                 all_results.append(sample_results)
                 
@@ -148,12 +150,29 @@ def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterfa
     else:
         return LocalModelInference(model_init_param)
     
-def get_average_prediction(repetitions : list) -> int:
+def get_average_prediction_boolean_prompt(repetitions : list) -> int:
     # convert predictions to ints where 1 = subjective, 0 = objective
     predictions = [1 if "subjective" in repetition['generated_text'].lower() else 0 for repetition in repetitions]
     avg_prediction = np.mean(predictions)
 
     if avg_prediction >= 0.5:
+        return 1
+    else:
+        return 0
+
+def get_average_prediction_numeric_prompt(repetitions : list) -> float:
+    # convert predictions to ints where 1 = subjective, 0 = objective
+    predictions = [extract_number_from_text(repetition['generated_text']) for repetition in repetitions]
+
+    # remove -1.0 values
+    predictions = [p for p in predictions if p != -1.0]
+
+    if len(predictions) == 0:
+        return -1.0
+
+    avg_prediction = np.mean(predictions)
+
+    if avg_prediction >= 50:
         return 1
     else:
         return 0
