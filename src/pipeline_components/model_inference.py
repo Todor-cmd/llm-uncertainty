@@ -27,7 +27,7 @@ class LocalModelInference(ModelInferenceInterface):
     """
     Wrapper for performing inference with pre-trained models
     """
-    def __init__(self, model_path, torch_dtype=torch.float16, device_map="auto", quantization="4bit"):
+    def __init__(self, model_path, torch_dtype=torch.float16, device_map="auto", quantization=None):
         """
         Initialize model and tokenizer for inference
         
@@ -87,30 +87,26 @@ class LocalModelInference(ModelInferenceInterface):
             print("Using CPU device")
         
         # Configure quantization if requested
-        quantization_config = None
-        if quantization == "4bit":
-            print("Using 4-bit quantization with bitsandbytes")
-            quantization_config = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_compute_dtype=torch_dtype,
-                bnb_4bit_use_double_quant=True,
-                bnb_4bit_quant_type="nf4"
+        if quantization:
+            quantization_config = self._get_quantization_config(quantization)
+            
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                torch_dtype=torch_dtype,
+                device_map=device_map,
+                local_files_only=True,
+                trust_remote_code=False, 
+                quantization_config=quantization_config
             )
-        elif quantization == "8bit":
-            print("Using 8-bit quantization with bitsandbytes")
-            quantization_config = BitsAndBytesConfig(
-                load_in_8bit=True,
-                bnb_8bit_compute_dtype=torch_dtype
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                torch_dtype=torch_dtype,
+                device_map=device_map,
+                local_files_only=True,
+                trust_remote_code=False,  
             )
-        
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_path,
-            torch_dtype=torch_dtype,
-            device_map=device_map,
-            local_files_only=True,
-            trust_remote_code=False,  # For security in offline environments
-            quantization_config=quantization_config
-        )
+
         print(f"✓ Model loaded in {time.time() - model_start:.2f} seconds")
         print(f"Model device: {self.model.device}")
         print(f"Model dtype: {self.model.dtype}")
@@ -141,6 +137,21 @@ class LocalModelInference(ModelInferenceInterface):
         self.generator.settings.top_k = 40
         
         print(f"✓ ExLlama model loaded in {time.time() - model_start:.2f} seconds")
+
+    def _get_quantization_config(self, quantization_type):
+        if quantization_type == "4bit":
+            return BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4"
+            )
+        elif quantization_type == "8bit":
+            return BitsAndBytesConfig(
+                load_in_8bit=True,
+                bnb_8bit_compute_dtype=torch.float16
+            )
+            
 
     def generate_with_token_probs(self, prompt, max_new_tokens=50):
         """

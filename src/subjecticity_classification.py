@@ -184,8 +184,8 @@ if __name__ == "__main__":
     models = {
         # "distilgpt2": "models/distilgpt2",
         # "openai": "gpt-4o-mini",
-        "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
-        # "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
+        # "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
+        "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
     }
     
     # Run the subjectivity classification
