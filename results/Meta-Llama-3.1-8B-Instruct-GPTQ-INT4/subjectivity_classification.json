@@ -1,0 +1,160 @@
+[
+  {
+    "sample_idx": 0,
+    "sentence": "Blanco established himself earlier in his career working for Dr. Luke's Kasz Money Productions.",
+    "true_label": 0,
+    "repetitions": [
+      {
+        "repetition": 0,
+        "generated_text": " 5",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "5",
+            0.14532466232776642
+          ]
+        ],
+        "inference_time": 2.0037052631378174
+      },
+      {
+        "repetition": 1,
+        "generated_text": " 8",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "8",
+            0.017907513305544853
+          ]
+        ],
+        "inference_time": 1.7584245204925537
+      },
+      {
+        "repetition": 2,
+        "generated_text": " 4",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "4",
+            0.02137674018740654
+          ]
+        ],
+        "inference_time": 1.7572352886199951
+      },
+      {
+        "repetition": 3,
+        "generated_text": " 5",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "5",
+            0.14532466232776642
+          ]
+        ],
+        "inference_time": 1.7598812580108643
+      },
+      {
+        "repetition": 4,
+        "generated_text": " 0",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "0",
+            0.43385928869247437
+          ]
+        ],
+        "inference_time": 1.7608156204223633
+      },
+      {
+        "repetition": 5,
+        "generated_text": " 0",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "0",
+            0.43385928869247437
+          ]
+        ],
+        "inference_time": 1.7602145671844482
+      },
+      {
+        "repetition": 6,
+        "generated_text": " 8",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "8",
+            0.017907513305544853
+          ]
+        ],
+        "inference_time": 1.7636222839355469
+      },
+      {
+        "repetition": 7,
+        "generated_text": " 0",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "0",
+            0.43385928869247437
+          ]
+        ],
+        "inference_time": 1.766636848449707
+      },
+      {
+        "repetition": 8,
+        "generated_text": " 4",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "4",
+            0.02137674018740654
+          ]
+        ],
+        "inference_time": 1.7667739391326904
+      },
+      {
+        "repetition": 9,
+        "generated_text": " 10",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "10",
+            0.07082558423280716
+          ]
+        ],
+        "inference_time": 1.7648015022277832
+      }
+    ],
+    "predicted_label": 0
+  }
+]

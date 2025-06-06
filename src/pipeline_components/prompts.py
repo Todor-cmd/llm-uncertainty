@@ -1,16 +1,16 @@
 subjectivity_classification_prompt = """
-Rate the subjectivity of the following sentence from a news article: "{sentence}"
+You are an expert in subjectivity classification. Rate the subjectivity of the following sentence from a news article on a scale from 0 to 100, where:
+- 0 represents completely objective (presents factual information without personal perspective)
+- 100 represents completely subjective (expresses the author's personal views, opinions, or bias)
 
-Your task is to rate this sentence on a scale from 0 to 100, where:
-- 0 represents completely objective (presents an objective view on the topic without the author's personal perspective)
-- 100 represents completely subjective (expresses the subjective view of the author behind it)
+IMPORTANT: ONLY respond with the numeric score (0-100) like in the following example:
 
-Objective sentences present factual information, events, or statements without the author's personal interpretation, opinion, or bias.
+Example:
+Sentence: "I personally hate eveything to do with the colour Red."
+Answer: 100
 
-Subjective sentences express the author's personal views, opinions, interpretations, evaluations, or emotional stance on the topic.
-
-Please respond with only the numeric score (0-100).
-"""
+Sentence: "{sentence}"
+Answer:"""
 
 subjectivity_uncertainty_score_prompt = """
 Statement: {sentence}

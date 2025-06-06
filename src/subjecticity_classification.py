@@ -91,7 +91,7 @@ def run_subjectivity_classification(
                         # Generate response
                         rep_start = time.time()
                         generated_text, token_probs = wrapper.generate_with_token_probs(
-                            prompt, max_new_tokens=20
+                            prompt, max_new_tokens=2
                         )
                         rep_end = time.time()
                         
@@ -149,6 +149,8 @@ def run_subjectivity_classification(
 def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterface:
     if model_name == "openai":
         return OpenAIModelInference(model_init_param)
+    # elif "llama" in model_name.lower(): # It didn't seem to work with exllama
+    #     return LocalModelInference(model_init_param, quantization="exllama")
     else:
         return LocalModelInference(model_init_param)
     
@@ -184,8 +186,8 @@ if __name__ == "__main__":
     models = {
         # "distilgpt2": "models/distilgpt2",
         # "openai": "gpt-4o-mini",
-        # "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
-        "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
+        # "Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
+        "Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
     }
     
     # Run the subjectivity classification
