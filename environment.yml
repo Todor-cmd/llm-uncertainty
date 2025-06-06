@@ -21,10 +21,13 @@ dependencies:
     - torch --index-url https://download.pytorch.org/whl/cu128
     - exllama
     - bitsandbytes
-    - transformers
     - accelerate
+    - transformers>=4.38.0
+    - peft>=0.15.0
     - auto-gptq
-
+    - protobuf
+    - optimum
+  
   
 
   
