@@ -34,17 +34,36 @@ class LocalModelInference(ModelInferenceInterface):
             raise FileNotFoundError(f"Model path does not exist: {model_path}")
         
         print(f"Loading model from: {model_path}")
+        print(f"CUDA available: {torch.cuda.is_available()}")
+        if torch.cuda.is_available():
+            print(f"CUDA device: {torch.cuda.get_device_name(0)}")
         
+        print("Loading tokenizer...")
+        tokenizer_start = time.time()
         # Load tokenizer and model from local files only
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             local_files_only=True,
             trust_remote_code=False  # For security in offline environments
         )
+        print(f"✓ Tokenizer loaded in {time.time() - tokenizer_start:.2f} seconds")
         
         # Set pad_token if it doesn't exist
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        print("Loading model...")
+        model_start = time.time()
+        
+        # Determine device - force CUDA if available
+        if torch.cuda.is_available():
+            device = "cuda:0"
+            device_map = {"": 0}  # Force all layers to GPU 0
+            print(f"Forcing model to CUDA device: {device}")
+        else:
+            device = "cpu"
+            device_map = "cpu"
+            print("Using CPU device")
         
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
@@ -53,8 +72,13 @@ class LocalModelInference(ModelInferenceInterface):
             local_files_only=True,
             trust_remote_code=False  # For security in offline environments
         )
+        print(f"✓ Model loaded in {time.time() - model_start:.2f} seconds")
+        print(f"Model device: {self.model.device}")
+        print(f"Model dtype: {self.model.dtype}")
+        if hasattr(self.model, 'hf_device_map'):
+            print(f"Device map: {self.model.hf_device_map}")
         
-        print(f"✓ Successfully loaded model and tokenizer")
+        print(f"✓ Total initialization time: {time.time() - tokenizer_start:.2f} seconds")
 
     def generate_with_token_probs(self, prompt, max_new_tokens=50):
         """
@@ -67,9 +91,17 @@ class LocalModelInference(ModelInferenceInterface):
         Returns:
             tuple: (generated_text, list of (token, probability) tuples)
         """
+        print("Tokenizing input...")
+        tokenize_start = time.time()
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
         input_length = inputs.input_ids.shape[1]
+        print(f"Input device: {inputs.input_ids.device}")
+        print(f"Model device: {self.model.device}")
+        print(f"Devices match: {inputs.input_ids.device == self.model.device}")
+        print(f"✓ Tokenization completed in {time.time() - tokenize_start:.2f} seconds")
         
+        print("Generating output...")
+        generate_start = time.time()
         with torch.no_grad():  # Save memory during inference
             outputs = self.model.generate(
                 **inputs,
@@ -81,7 +113,10 @@ class LocalModelInference(ModelInferenceInterface):
                 output_scores=True,
                 pad_token_id=self.tokenizer.pad_token_id
             )
+        print(f"✓ Generation completed in {time.time() - generate_start:.2f} seconds")
         
+        print("Processing output tokens and probabilities...")
+        process_start = time.time()
         # Extract generated tokens (excluding input tokens)
         generated_sequence = outputs.sequences[0]
         generated_tokens = generated_sequence[input_length:]  # Only new tokens
@@ -105,7 +140,9 @@ class LocalModelInference(ModelInferenceInterface):
         
         # Generate the full text for verification
         generated_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+        print(f"✓ Output processing completed in {time.time() - process_start:.2f} seconds")
         
+        print(f"✓ Total inference time: {time.time() - tokenize_start:.2f} seconds")
         return generated_text, token_probs
     
 class OpenAIModelInference(ModelInferenceInterface):

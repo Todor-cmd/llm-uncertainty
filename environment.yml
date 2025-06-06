@@ -2,6 +2,7 @@ name: llm-uncertainty
 channels:
   - conda-forge
   - pytorch
+  - nvidia
   - defaults
 dependencies:
   - python=3.10
@@ -12,8 +13,8 @@ dependencies:
   - matplotlib
   - seaborn
   - jupyter
-  - pytorch
   - transformers
+  - huggingface_hub
   - uncertainty-toolbox
   - langchain-community
   - langchain-openai
@@ -21,5 +22,8 @@ dependencies:
   - pip:
       - dotenv
       - accelerate
-      - huggingface-hub
+      - auto-gptq
+      - torch --index-url https://download.pytorch.org/whl/cu124
+
+
   

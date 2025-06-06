@@ -9,11 +9,13 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
+
 def run_subjectivity_classification(
         models : dict,
         data_path : str = "src/data/test_en_gold.tsv",
         sample_repetitions : int = 10,
-        samples_limit : int = 100
+        samples_limit : int = 100,
+        batch_size : int = 4  
     ):
 
     # Step 1: Check which models are available
@@ -181,10 +183,9 @@ if __name__ == "__main__":
     # Define your local model paths
     models = {
         # "distilgpt2": "models/distilgpt2",
-        "openai": "gpt-4o-mini",
-        # Add more models as needed
-        # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-        # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
+        # "openai": "gpt-4o-mini",
+        "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
+        # "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
     }
     
     # Run the subjectivity classification
