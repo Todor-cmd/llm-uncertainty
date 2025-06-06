@@ -1,11 +1,18 @@
 import time
 import torch
 import numpy as np  # Add numpy import
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
+try:
+    from exllama.model import ExLlama, ExLlamaConfig
+    from exllama.tokenizer import ExLlamaTokenizer
+    from exllama.generator import ExLlamaGenerator
+    EXLLAMA_AVAILABLE = True
+except ImportError:
+    EXLLAMA_AVAILABLE = False
 load_dotenv()
 
 class ModelInferenceInterface:
@@ -20,7 +27,7 @@ class LocalModelInference(ModelInferenceInterface):
     """
     Wrapper for performing inference with pre-trained models
     """
-    def __init__(self, model_path, torch_dtype=torch.float16, device_map="auto"):
+    def __init__(self, model_path, torch_dtype=torch.float16, device_map="auto", quantization="4bit"):
         """
         Initialize model and tokenizer for inference
         
@@ -28,6 +35,7 @@ class LocalModelInference(ModelInferenceInterface):
             model_path (str): Local path to the downloaded model
             torch_dtype: Torch data type for model weights
             device_map: Device mapping for model
+            quantization: Quantization method ("4bit", "8bit", "exllama", or None)
         """
         # Verify the model path exists
         if not Path(model_path).exists():
@@ -38,6 +46,19 @@ class LocalModelInference(ModelInferenceInterface):
         if torch.cuda.is_available():
             print(f"CUDA device: {torch.cuda.get_device_name(0)}")
         
+        self.using_exllama = False
+        
+        if quantization == "exllama":
+            if not EXLLAMA_AVAILABLE:
+                raise ImportError("ExLlama is not installed. Please install it first.")
+            if not torch.cuda.is_available():
+                raise RuntimeError("ExLlama requires CUDA to be available")
+                
+            print("Loading with ExLlama...")
+            self._load_with_exllama(model_path)
+            self.using_exllama = True
+            return
+            
         print("Loading tokenizer...")
         tokenizer_start = time.time()
         # Load tokenizer and model from local files only
@@ -65,12 +86,30 @@ class LocalModelInference(ModelInferenceInterface):
             device_map = "cpu"
             print("Using CPU device")
         
+        # Configure quantization if requested
+        quantization_config = None
+        if quantization == "4bit":
+            print("Using 4-bit quantization with bitsandbytes")
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch_dtype,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4"
+            )
+        elif quantization == "8bit":
+            print("Using 8-bit quantization with bitsandbytes")
+            quantization_config = BitsAndBytesConfig(
+                load_in_8bit=True,
+                bnb_8bit_compute_dtype=torch_dtype
+            )
+        
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             torch_dtype=torch_dtype,
             device_map=device_map,
             local_files_only=True,
-            trust_remote_code=False  # For security in offline environments
+            trust_remote_code=False,  # For security in offline environments
+            quantization_config=quantization_config
         )
         print(f"✓ Model loaded in {time.time() - model_start:.2f} seconds")
         print(f"Model device: {self.model.device}")
@@ -79,6 +118,29 @@ class LocalModelInference(ModelInferenceInterface):
             print(f"Device map: {self.model.hf_device_map}")
         
         print(f"✓ Total initialization time: {time.time() - tokenizer_start:.2f} seconds")
+
+    def _load_with_exllama(self, model_path):
+        """Load model using ExLlama for faster inference"""
+        print("Initializing ExLlama...")
+        model_start = time.time()
+        
+        # Load config and model
+        config = ExLlamaConfig(Path(model_path) / "config.json")
+        config.model_path = str(Path(model_path) / "model.safetensors")
+        self.model = ExLlama(config)
+        
+        # Load tokenizer
+        self.tokenizer = ExLlamaTokenizer(Path(model_path))
+        
+        # Create generator
+        self.generator = ExLlamaGenerator(self.model, self.tokenizer)
+        
+        # Set reasonable defaults
+        self.generator.settings.temperature = 0.7
+        self.generator.settings.top_p = 0.95
+        self.generator.settings.top_k = 40
+        
+        print(f"✓ ExLlama model loaded in {time.time() - model_start:.2f} seconds")
 
     def generate_with_token_probs(self, prompt, max_new_tokens=50):
         """
@@ -91,6 +153,13 @@ class LocalModelInference(ModelInferenceInterface):
         Returns:
             tuple: (generated_text, list of (token, probability) tuples)
         """
+        if self.using_exllama:
+            # ExLlama has a different generation method
+            output = self.generator.generate(prompt, max_new_tokens=max_new_tokens)
+            # ExLlama doesn't provide token probabilities directly
+            # Return empty list for probabilities
+            return output, []
+            
         print("Tokenizing input...")
         tokenize_start = time.time()
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
@@ -107,8 +176,8 @@ class LocalModelInference(ModelInferenceInterface):
                 **inputs,
                 max_new_tokens=max_new_tokens,
                 do_sample=True,
-                temperature=0.7, ## should consider this hyperparameter
-                top_p=0.9,  ## should consider this hyperparameter
+                temperature=0.7,
+                top_p=0.9,
                 return_dict_in_generate=True,
                 output_scores=True,
                 pad_token_id=self.tokenizer.pad_token_id
@@ -142,7 +211,7 @@ class LocalModelInference(ModelInferenceInterface):
         generated_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
         print(f"✓ Output processing completed in {time.time() - process_start:.2f} seconds")
         
-        print(f"✓ Total inference time: {time.time() - tokenize_start:.2f} seconds")
+        print(f"✓ Total inference time: {time.time() - generate_start:.2f} seconds")
         return generated_text, token_probs
     
 class OpenAIModelInference(ModelInferenceInterface):
@@ -229,69 +298,3 @@ def check_model_build_requirements(model_name, model_init_param):
         return True
 
 
-if __name__ == "__main__":
-    # Define your local model paths
-    models = {
-        # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-        "distilgpt2": "models/distilgpt2",
-        # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
-        # "google/gemma-7b": "./models/google/gemma-7b-it", 
-        # "microsoft/Phi-3-mini-4k": "./models/microsoft/Phi-3-mini-4k-instruct"
-    }
-
-    # Check if models exist before running inference
-    print("Checking for model files...")
-
-    start_check = time.time()
-
-    available_models = {}
-    for model_name, model_path in models.items():
-        if check_model_build_requirements(model_path):
-            available_models[model_name] = model_path
-
-    end_check = time.time()
-    print(f"Model file check took {end_check - start_check:.2f} seconds.")
-
-    if not available_models:
-        print("❌ No valid models found. Please download models first.")
-        exit(1)
-
-    # Run inference on available models
-    results = {}
-    prompt = "Hello! How are you today? I am"
-
-    for model_name, model_path in available_models.items():
-        try:
-            print(f"\n{'='*50}")
-            print(f"Processing: {model_name}")
-            print(f"{'='*50}")
-            
-            load_start = time.time()
-            wrapper = LocalModelInference(model_path)
-            load_end = time.time()
-            print(f"Model load time: {load_end - load_start:.2f} seconds")
-            
-            # Then run the main generation
-            print("\nRunning main generation...")
-            gen_start = time.time()
-            generated_text, token_probs = wrapper.generate_with_token_probs(prompt, max_new_tokens=20)
-            gen_end = time.time()
-            print(f"Generation time: {gen_end - gen_start:.2f} seconds")
-            results[model_name] = (generated_text, token_probs)
-                
-        except Exception as e:
-            print(f"❌ Failed to process {model_name}: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    # Print full results
-    print(f"\n{'='*50}")
-    print("FINAL RESULTS")
-    print(f"{'='*50}")
-
-    for model_name, (generated_text, token_probs) in results.items():
-        print(f"\n{model_name}:")
-        print(f"Generated: '{generated_text}'")
-        print("Token probabilities:")
-        for token, prob in token_probs:
-            print(f"  '{token}' (repr: {repr(token)}): {prob:.4f}")
