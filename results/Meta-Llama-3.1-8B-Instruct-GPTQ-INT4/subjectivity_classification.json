@@ -6,6 +6,21 @@
     "repetitions": [
       {
         "repetition": 0,
+        "generated_text": " 0",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "0",
+            0.43385928869247437
+          ]
+        ],
+        "inference_time": 1.9968500137329102
+      },
+      {
+        "repetition": 1,
         "generated_text": " 5",
         "token_probs": [
           [
@@ -17,37 +32,22 @@
             0.14532466232776642
           ]
         ],
-        "inference_time": 2.0037052631378174
-      },
-      {
-        "repetition": 1,
-        "generated_text": " 8",
-        "token_probs": [
-          [
-            " ",
-            1.0
-          ],
-          [
-            "8",
-            0.017907513305544853
-          ]
-        ],
-        "inference_time": 1.7584245204925537
+        "inference_time": 1.7495746612548828
       },
       {
         "repetition": 2,
-        "generated_text": " 4",
+        "generated_text": " 0",
         "token_probs": [
           [
             " ",
             1.0
           ],
           [
-            "4",
-            0.02137674018740654
+            "0",
+            0.43385928869247437
           ]
         ],
-        "inference_time": 1.7572352886199951
+        "inference_time": 1.7525405883789062
       },
       {
         "repetition": 3,
@@ -62,22 +62,22 @@
             0.14532466232776642
           ]
         ],
-        "inference_time": 1.7598812580108643
+        "inference_time": 1.7497389316558838
       },
       {
         "repetition": 4,
-        "generated_text": " 0",
+        "generated_text": " 15",
         "token_probs": [
           [
             " ",
             1.0
           ],
           [
-            "0",
-            0.43385928869247437
+            "15",
+            0.022993700578808784
           ]
         ],
-        "inference_time": 1.7608156204223633
+        "inference_time": 1.7529964447021484
       },
       {
         "repetition": 5,
@@ -92,25 +92,10 @@
             0.43385928869247437
           ]
         ],
-        "inference_time": 1.7602145671844482
+        "inference_time": 1.7515387535095215
       },
       {
         "repetition": 6,
-        "generated_text": " 8",
-        "token_probs": [
-          [
-            " ",
-            1.0
-          ],
-          [
-            "8",
-            0.017907513305544853
-          ]
-        ],
-        "inference_time": 1.7636222839355469
-      },
-      {
-        "repetition": 7,
         "generated_text": " 0",
         "token_probs": [
           [
@@ -122,37 +107,52 @@
             0.43385928869247437
           ]
         ],
-        "inference_time": 1.766636848449707
+        "inference_time": 1.7579092979431152
+      },
+      {
+        "repetition": 7,
+        "generated_text": " 20",
+        "token_probs": [
+          [
+            " ",
+            1.0
+          ],
+          [
+            "20",
+            0.07231657207012177
+          ]
+        ],
+        "inference_time": 1.7551274299621582
       },
       {
         "repetition": 8,
-        "generated_text": " 4",
+        "generated_text": " 0",
         "token_probs": [
           [
             " ",
             1.0
           ],
           [
-            "4",
-            0.02137674018740654
+            "0",
+            0.43385928869247437
           ]
         ],
-        "inference_time": 1.7667739391326904
+        "inference_time": 1.7575438022613525
       },
       {
         "repetition": 9,
-        "generated_text": " 10",
+        "generated_text": " 0",
         "token_probs": [
           [
             " ",
             1.0
           ],
           [
-            "10",
-            0.07082558423280716
+            "0",
+            0.43385928869247437
           ]
         ],
-        "inference_time": 1.7648015022277832
+        "inference_time": 1.7574396133422852
       }
     ],
     "predicted_label": 0

@@ -17,7 +17,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.6331093311309814
+        "inference_time": 1.5484557151794434
       },
       {
         "repetition": 1,
@@ -32,7 +32,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.293342113494873
+        "inference_time": 1.2972023487091064
       },
       {
         "repetition": 2,
@@ -47,7 +47,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.2997283935546875
+        "inference_time": 1.300539493560791
       },
       {
         "repetition": 3,
@@ -62,7 +62,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.296053409576416
+        "inference_time": 1.300415277481079
       },
       {
         "repetition": 4,
@@ -77,7 +77,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.2950029373168945
+        "inference_time": 1.2983686923980713
       },
       {
         "repetition": 5,
@@ -92,7 +92,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.3018438816070557
+        "inference_time": 1.298893928527832
       },
       {
         "repetition": 6,
@@ -107,7 +107,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.2974047660827637
+        "inference_time": 1.3025624752044678
       },
       {
         "repetition": 7,
@@ -122,7 +122,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.2992067337036133
+        "inference_time": 1.2991249561309814
       },
       {
         "repetition": 8,
@@ -137,7 +137,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.3034727573394775
+        "inference_time": 1.3008182048797607
       },
       {
         "repetition": 9,
@@ -152,7 +152,7 @@
             1.0
           ]
         ],
-        "inference_time": 1.2998747825622559
+        "inference_time": 1.3020200729370117
       }
     ],
     "predicted_label": 0

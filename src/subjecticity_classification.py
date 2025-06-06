@@ -9,6 +9,9 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
+import subprocess
+import sys
+
 
 def run_subjectivity_classification(
         models : dict,
@@ -38,114 +41,146 @@ def run_subjectivity_classification(
     except Exception as e:
         print(f"Failed to load data: {str(e)}")
         return
-
+    
     # Step 3: Run inference for each available model
     for model_name, model_init_param in available_models.items():
         print(f"\n{'='*60}")
-        print(f"Processing model: {model_name}")
+        print(f"Starting subprocess for model: {model_name}")
         print(f"{'='*60}")
         
-        # Create model-specific output directory
-        output_dir = Path(os.path.join("results", model_name))
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Define file paths
-        output_file = output_dir / "subjectivity_classification.json"
-        intermediate_file = output_dir / "intermediate.json"
-        
         try:
-            # Load model
-            print("Loading model...")
-            load_start = time.time()
-            wrapper = load_models(model_name, model_init_param)
-            load_end = time.time()
-            print(f"Model load time: {load_end - load_start:.2f} seconds")
+            # Use subprocess to run each model in a separate Python process
+            cmd = [
+                sys.executable,  # Current Python interpreter
+                "src/single_model_inference.py",
+                "--model_name", model_name,
+                "--model_path", model_init_param,
+                "--data_path", data_path,
+                "--sample_repetitions", str(sample_repetitions),
+                "--samples_limit", str(samples_limit)
+            ]
             
-            # Prepare results storage
-            all_results = []
+            print(f"Running command: {' '.join(cmd)}")
             
-            # Run inference for each sample with repetitions
-            for sample_idx, batch in enumerate(dataloader):
-                # Limit the number of samples if specified
-                if samples_limit is not None and sample_idx >= samples_limit:
-                    break
-
-                sentence = batch['sentence'][0]  # Extract sentence from batch
-                true_label = batch['label'][0]  # Extract true label
-                
-                print(f"Processing sample {sample_idx + 1}/{min(len(dataloader), samples_limit)}: '{sentence[:50]}...'")
-                
-                sample_results = {
-                    'sample_idx': int(sample_idx),
-                    'sentence': str(sentence),
-                    'true_label': int(true_label),
-                    'repetitions': []
-                }
-                
-                # Run multiple repetitions for this sample
-                for rep in tqdm(range(sample_repetitions), desc="Running repetitions"):
-                    try:
-                        # Create prompt for subjectivity classification
-                        prompt = subjectivity_classification_prompt.format(sentence=sentence)
-                        
-                        # Generate response
-                        rep_start = time.time()
-                        generated_text, token_probs = wrapper.generate_with_token_probs(
-                            prompt, max_new_tokens=2
-                        )
-                        rep_end = time.time()
-                        
-                        repetition_result = {
-                            'repetition': int(rep),
-                            'generated_text': str(generated_text),
-                            'token_probs': [
-                                (str(token), float(prob)) for token, prob in token_probs
-                            ],
-                            'inference_time': float(rep_end - rep_start)
-                        }
-                        
-                        sample_results['repetitions'].append(repetition_result)
-
-                        
-                    except Exception as e:
-                        print(f"Error in inference for repetition {rep}: {str(e)}")
-                        continue
-                
-                avg_prediction = get_average_prediction_numeric_prompt(sample_results['repetitions'])
-                sample_results['predicted_label'] = avg_prediction
-                all_results.append(sample_results)
-                
-                # Update intermediate file every 10 samples (overwrite previous)
-                if (sample_idx + 1) % 10 == 0:
-                    try:
-                        with open(intermediate_file, 'w') as f:
-                            json.dump(all_results, f, indent=2)
-                        print(f"Updated intermediate results (samples: {sample_idx + 1})")
-                    except Exception as e:
-                        print(f"Warning: Failed to save intermediate results: {str(e)}")
+            # Run the subprocess and wait for completion
+            result = subprocess.run(cmd, capture_output=True, text=True, cwd=".")
             
-            # Step 4: Save final results and clean up intermediate file
-            try:
-                with open(output_file, 'w') as f:
-                    json.dump(all_results, f, indent=2)
-                print(f"Saved final results to {output_file}")
+            if result.returncode == 0:
+                print(f"✓ Successfully completed {model_name}")
+                print("STDOUT:", result.stdout)
+            else:
+                print(f"❌ Failed to process {model_name}")
+                print("STDOUT:", result.stdout)
+                print("STDERR:", result.stderr)
                 
-                # Clean up intermediate file after successful final save
-                if intermediate_file.exists():
-                    intermediate_file.unlink()
-                    print("Cleaned up intermediate file")
-                    
-            except Exception as e:
-                print(f"Error saving final results: {str(e)}")
-                # Keep intermediate file if final save failed
-                print(f"Intermediate results preserved in {intermediate_file}")
-            
         except Exception as e:
-            print(f"Failed to process {model_name}: {str(e)}")
+            print(f"Failed to run subprocess for {model_name}: {str(e)}")
             import traceback
             traceback.print_exc()
             continue
 
+def run_inference_for_model(model_name, model_init_param, dataloader, sample_repetitions, samples_limit):
+
+    print(f"\n{'='*60}")
+    print(f"Processing model: {model_name}")
+    print(f"{'='*60}")
+
+    # Create model-specific output directory
+    output_dir = Path(os.path.join("results", model_name))
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Define file paths
+    output_file = output_dir / "subjectivity_classification.json"
+    intermediate_file = output_dir / "intermediate.json"
+
+    
+    # Load model
+    print("Loading model...")
+    load_start = time.time()
+    wrapper = load_models(model_name, model_init_param)
+    load_end = time.time()
+    print(f"Model load time: {load_end - load_start:.2f} seconds")
+    
+    # Prepare results storage
+    all_results = []
+    
+    # Run inference for each sample with repetitions
+    for sample_idx, batch in enumerate(dataloader):
+        # Limit the number of samples if specified
+        if samples_limit is not None and sample_idx >= samples_limit:
+            break
+
+        sentence = batch['sentence'][0]  # Extract sentence from batch
+        true_label = batch['label'][0]  # Extract true label
+        
+        print(f"Processing sample {sample_idx + 1}/{min(len(dataloader), samples_limit)}: '{sentence[:50]}...'")
+        
+        sample_results = {
+            'sample_idx': int(sample_idx),
+            'sentence': str(sentence),
+            'true_label': int(true_label),
+            'repetitions': []
+        }
+        
+        # Run multiple repetitions for this sample
+        for rep in tqdm(range(sample_repetitions), desc="Running repetitions"):
+            try:
+                # Create prompt for subjectivity classification
+                prompt = subjectivity_classification_prompt.format(sentence=sentence)
+                
+                # Generate response
+                rep_start = time.time()
+                generated_text, token_probs = wrapper.generate_with_token_probs(
+                    prompt, max_new_tokens=2
+                )
+                rep_end = time.time()
+                
+                repetition_result = {
+                    'repetition': int(rep),
+                    'generated_text': str(generated_text),
+                    'token_probs': [
+                        (str(token), float(prob)) for token, prob in token_probs
+                    ],
+                    'inference_time': float(rep_end - rep_start)
+                }
+                
+                sample_results['repetitions'].append(repetition_result)
+                
+                
+            except Exception as e:
+                print(f"Error in inference for repetition {rep}: {str(e)}")
+                continue
+        
+        avg_prediction = get_average_prediction_numeric_prompt(sample_results['repetitions'])
+        sample_results['predicted_label'] = avg_prediction
+        all_results.append(sample_results)
+        
+        # Update intermediate file every 10 samples (overwrite previous)
+        if (sample_idx + 1) % 10 == 0:
+            try:
+                with open(intermediate_file, 'w') as f:
+                    json.dump(all_results, f, indent=2)
+                print(f"Updated intermediate results (samples: {sample_idx + 1})")
+            except Exception as e:
+                print(f"Warning: Failed to save intermediate results: {str(e)}")
+    
+    # Step 4: Save final results and clean up intermediate file
+    try:
+        with open(output_file, 'w') as f:
+            json.dump(all_results, f, indent=2)
+        print(f"Saved final results to {output_file}")
+        
+        # Clean up intermediate file after successful final save
+        if intermediate_file.exists():
+            intermediate_file.unlink()
+            print("Cleaned up intermediate file")
+            
+    except Exception as e:
+        print(f"Error saving final results: {str(e)}")
+        # Keep intermediate file if final save failed
+        print(f"Intermediate results preserved in {intermediate_file}")
+        
+        
 def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterface:
     if model_name == "openai":
         return OpenAIModelInference(model_init_param)
@@ -186,7 +221,7 @@ if __name__ == "__main__":
     models = {
         # "distilgpt2": "models/distilgpt2",
         # "openai": "gpt-4o-mini",
-        # "Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
+        "Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
         "Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
     }
     

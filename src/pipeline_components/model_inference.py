@@ -31,6 +31,38 @@ class LocalModelInference(ModelInferenceInterface):
             device_map: Device mapping for model
             quantization: Quantization method ("4bit", "8bit" or None)
         """
+        # Set CUDA memory management to reduce fragmentation
+        os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+        
+        # Clean up any existing GPU memory before loading new model
+        print("Cleaning GPU memory before model loading...")
+        import gc
+        
+        # More aggressive cleanup - try to free any lingering model references
+        if torch.cuda.is_available():
+            print(f"Before cleanup - Allocated: {torch.cuda.memory_allocated() / 1024**3:.2f} GB")
+            print(f"Before cleanup - Reserved: {torch.cuda.memory_reserved() / 1024**3:.2f} GB")
+            
+            # Clear all cached memory
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
+            torch.cuda.ipc_collect()
+            
+            # Force multiple garbage collection cycles with CUDA cleanup
+            for _ in range(5):
+                gc.collect()
+                torch.cuda.empty_cache()
+            
+            # Try to reset memory stats and clear everything
+            torch.cuda.reset_peak_memory_stats()
+            torch.cuda.reset_accumulated_memory_stats()
+            
+            print(f"After cleanup - Allocated: {torch.cuda.memory_allocated() / 1024**3:.2f} GB")
+            print(f"After cleanup - Reserved: {torch.cuda.memory_reserved() / 1024**3:.2f} GB")
+            print(f"✓ GPU memory cleanup completed")
+        else:
+            print("CUDA not available - skipping GPU cleanup")
+        
         # Verify the model path exists
         if not Path(model_path).exists():
             raise FileNotFoundError(f"Model path does not exist: {model_path}")
