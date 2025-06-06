@@ -12,6 +12,14 @@ Subjective sentences express the author's personal views, opinions, interpretati
 Please respond with only the numeric score (0-100).
 """
 
+subjectivity_classification_binary_prompt = """
+Rate the subjectivity of the following sentence from a news article: "{sentence}"
+Your task is to classify this sentence as either subjective or objective.
+- If the sentence expresses the subjective view of the author, classify it as "subjective".
+- If the sentence presents an objective view on the topic, classify it as "objective".
+Please respond with only "subjective" or "objective".
+"""
+
 subjectivity_uncertainty_score_prompt = """
 Statement: {sentence}
 Proposed answer: {proposed_answer}
