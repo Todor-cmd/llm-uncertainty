@@ -226,5 +226,5 @@ if __name__ == "__main__":
     }
     
     # Run the subjectivity classification
-    run_subjectivity_classification(models=models, samples_limit=1)
+    run_subjectivity_classification(models=models, samples_limit=100)
     
