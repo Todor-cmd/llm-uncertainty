@@ -45,6 +45,8 @@ def run_uncertainty_quantification(
             # save predictive entropy results to inference results
             for i, sample in enumerate(inference_results):
                 sample['predictive_entropy'] = predictive_entropy_results[i]
+                # remove the repetitions field to save space
+                sample.pop('repetitions', None)
             # Save updated inference results with predictive entropy to output path
             with open(output_path, 'w') as f:
                 json.dump(inference_results, f, indent=4)
@@ -52,6 +54,6 @@ def run_uncertainty_quantification(
         #TODO: Add other quantifiers
 
 if __name__ == "__main__":
-    run_uncertainty_quantification(quantifier=QuantifierType.VERBALISED, model_names=["openai"])
+    run_uncertainty_quantification(quantifier=QuantifierType.PREDICTIVE_ENTROPY, model_names=["openai"])
     
     

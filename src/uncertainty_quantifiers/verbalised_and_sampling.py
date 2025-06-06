@@ -4,7 +4,7 @@ import json
 from tqdm import tqdm
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from pipeline_components.prompts import subjectivity_uncertainty_prompt
+from pipeline_components.prompts import subjectivity_uncertainty_score_prompt
 from pipeline_components.number_parser import extract_number_from_text
 
 load_dotenv()
@@ -46,7 +46,7 @@ class VerbalisedQuantifier:
                 classification = "objective"
             
             # Create the complete prompt
-            prompt = subjectivity_uncertainty_prompt.format(
+            prompt = subjectivity_uncertainty_score_prompt.format(
                 sentence=sentence, 
                 proposed_answer=classification
             )
