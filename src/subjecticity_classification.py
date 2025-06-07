@@ -184,10 +184,8 @@ def run_inference_for_model(model_name, model_init_param, dataloader, sample_rep
 def load_models(model_name: str, model_init_param: str) -> ModelInferenceInterface:
     if model_name == "openai":
         return OpenAIModelInference(model_init_param)
-    # elif "llama" in model_name.lower(): # It didn't seem to work with exllama
-    #     return LocalModelInference(model_init_param, quantization="exllama")
-    else:
-        return LocalModelInference(model_init_param)
+    
+    return LocalModelInference(model_init_param)
     
 def get_average_prediction_boolean_prompt(repetitions : list) -> int:
     # convert predictions to ints where 1 = subjective, 0 = objective

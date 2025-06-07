@@ -2,11 +2,14 @@ import json
 import os
 from uncertainty_quantifiers.verbalised_and_sampling import HybridVerbalisedSamplingQuantifier
 from typing import List
+from download_models import get_all_model_dict
+from src.subjecticity_classification import load_models
+
 def run_uncertainty_quantification(
-        model_names : List[str] = ["distilgpt2"]
+        model_names : dict
     ):
 
-    for model_name in model_names:
+    for model_name, model_init_param in model_names.items():
         output_dir = os.path.join("results", model_name)
         results_path = os.path.join(output_dir, "subjectivity_classification.json")
         
@@ -22,12 +25,15 @@ def run_uncertainty_quantification(
         # Step 2: Run uncertainty quantification which should save results to output_dir
         # as a .npy file where index corresponds to sample index
         uncertainty_output_dir = os.path.join(output_dir, "uncertainty_estimates")
-        hybrid_quantifier = HybridVerbalisedSamplingQuantifier(uncertainty_output_dir, inference_results)
+
+        model = load_models(model_name, model_init_param)
+        hybrid_quantifier = HybridVerbalisedSamplingQuantifier(model, uncertainty_output_dir, inference_results)
         hybrid_quantifier.calculate_uncertainty()
 
-        #TODO: Add other quantifiers
-
 if __name__ == "__main__":
-    run_uncertainty_quantification()
+    models = get_all_model_dict()
+    models.pop("openai") # TODO: after testing prompt, remove this line
+    models.pop("Meta-Llama-3.1-8B-Instruct-GPTQ-INT4") # TODO: after testing prompt, remove this line
+    run_uncertainty_quantification(models)
     
     

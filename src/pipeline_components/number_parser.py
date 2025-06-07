@@ -22,7 +22,7 @@ def extract_number_from_text(text):
         # Return the first number found
         number = float(matches[0])
         if number > 100 or number < 0:
-            print(f"Warning: Extracted number {number} is out of range, marking inalid as -1.0")
+            # print(f"Warning: Extracted number {number} is out of range, marking inalid as -1.0")
             return -1.0
         return number
 
@@ -35,7 +35,7 @@ def extract_number_from_text(text):
             pass
 
     # Default fallback if no number can be extracted
-    print(f"Warning: Could not extract number from '{text}', marking inalid as -1.0")
+    # print(f"Warning: Could not extract number from '{text}', marking inalid as -1.0")
     return -1.0
 
 
