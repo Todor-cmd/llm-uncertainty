@@ -214,7 +214,7 @@ class OpenAIModelInference(ModelInferenceInterface):
     def __init__(self, model_name):
         self.model = ChatOpenAI(model=model_name)
 
-    def generate_with_token_probs(self, prompt, max_new_tokens=50):
+    def generate_with_token_probs(self, prompt, max_new_tokens=2):
         """
         Generate output and extract token probabilities using OpenAI's logprobs feature
         
@@ -229,7 +229,8 @@ class OpenAIModelInference(ModelInferenceInterface):
         model_with_logprobs = self.model.bind(
             logprobs=True,
             max_tokens=max_new_tokens,
-            temperature=0.7  # Match the temperature used in LocalModelInference
+            temperature=1.5,
+            top_p=0.9
         )
         
         # Generate response

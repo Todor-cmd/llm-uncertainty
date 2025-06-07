@@ -219,10 +219,9 @@ def get_average_prediction_numeric_prompt(repetitions : list) -> float:
 if __name__ == "__main__":
     # Define your local model paths
     models = {
-        # "distilgpt2": "models/distilgpt2",
-        # "openai": "gpt-4o-mini",
-        "Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
-        "Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
+        "openai": "gpt-4o-mini",
+        # "Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
+        # "Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
     }
     
     # Run the subjectivity classification

@@ -31,17 +31,16 @@ def download_model(model_name, save_dir):
 
 def download_all():
     """Download all required models"""
-    models = {
-        "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
-        "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
-    }
     
     for model_name, save_path in models.items():
         download_model(model_name, save_path)
 
-def get_all_model_list():
-    all_models = models.copy()
-    all_models["openai"] = "gpt-4o-mini"
+def get_all_model_dict():
+    all_models = {
+        "openai": "gpt-4o-mini",
+        "Meta-Llama-3.1-8B-Instruct-GPTQ-INT4": "src/models/Llama-3.1-8B-Instruct-GPTQ-INT4",
+        "Mistral-7B-Instruct-v0.3-GPTQ-4bit": "src/models/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
+    }
     return all_models
 
 
