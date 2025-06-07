@@ -1,6 +1,6 @@
 import re
 
-def extract_number_from_text(text, bottom_up=False, prefix=None):
+def extract_number_from_text(text, bottom_up=False, prefix=None, prefix_only=False):
     """
     Extract the first number from text, handling various formats.
 
@@ -25,6 +25,8 @@ def extract_number_from_text(text, bottom_up=False, prefix=None):
             if 0 <= number <= 100:
                 return number
             # If out of range, continue to other methods
+            if prefix_only:
+                return -1.0
 
     # Try to find numbers in the text using regex
     # This pattern matches positive and negative integers and decimals

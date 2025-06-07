@@ -8,6 +8,7 @@ from pipeline_components.prompts import subjectivity_uncertainty_score_prompt
 from pipeline_components.number_parser import extract_number_from_text
 from pipeline_components.model_inference import ModelInferenceInterface
 from typing import List
+import time
 load_dotenv()
 
 class VerbalisedQuantifier:
@@ -33,6 +34,7 @@ class VerbalisedQuantifier:
         responses = {}
         
         # Use tqdm for progress bar
+        time_start = time.time()
         for sentence, prediction in tqdm(zip(self.sentences, self.predictions), 
                                        total=len(self.sentences), 
                                        desc="Calculating uncertainties"):
@@ -61,7 +63,8 @@ class VerbalisedQuantifier:
                         (str(token), float(prob)) for token, prob in token_probs
                     ],
             }
-            
+        time_end = time.time()
+        print(f"Time taken: {time_end - time_start} seconds")
 
         # Save the responses
         with open(os.path.join(self.output_dir, "verbalised_responses.json"), "w") as f:
@@ -69,9 +72,17 @@ class VerbalisedQuantifier:
 
         for sentence, response_data in responses.items():
             # Extract number from response content and convert to 0-1 scale
-            uncertainty_score = extract_number_from_text(response_data["response"], bottom_up=True, prefix = "uncertainty score:")
-            uncertainty = uncertainty_score / 100.0
-            uncertainties.append(uncertainty)
+            uncertainty_score = extract_number_from_text(
+                response_data["response"], 
+                bottom_up=True, 
+                prefix = "uncertainty score:",
+                prefix_only=True
+            )
+            if uncertainty_score == -1.0:
+                uncertainties.append(-1.0)
+            else:
+                uncertainty = uncertainty_score / 100.0
+                uncertainties.append(uncertainty)
 
         uncertainty_array = np.array(uncertainties)
         np.save(os.path.join(self.output_dir, "verbalised_uncertainty.npy"), uncertainty_array)
@@ -94,6 +105,7 @@ class SampleAvgDevQuantifier:
         for result in self.inference_results:
             # Skip samples with invalid predictions (same as VerbalisedQuantifier)
             if result['predicted_label'] == -1.0:
+                deviations.append(-1.0)
                 continue
                 
             sentence = result["sentence"]
@@ -110,14 +122,21 @@ class SampleAvgDevQuantifier:
             
             deviations.append(avg_deviation)
         # Min-max normalise deviaitons to 0-1 scale
-        min_deviation = min(deviations)
-        max_deviation = max(deviations)
+        # Filter out -1 values for min/max calculation
+        valid_deviations = [d for d in deviations if d != -1.0]
+        min_deviation = min(valid_deviations)
+        max_deviation = max(valid_deviations)
         
-        if max_deviation == min_deviation:
-            # All deviations are the same, assign 0 uncertainty to all
-            uncertainties = [0.0] * len(deviations)
-        else:
-            uncertainties = [(deviation - min_deviation) / (max_deviation - min_deviation) for deviation in deviations]
+        uncertainties = []
+        for deviation in deviations:
+            if deviation == -1.0:
+                uncertainties.append(-1.0)
+            elif max_deviation == min_deviation:
+                # All valid deviations are the same, assign 0 uncertainty
+                uncertainties.append(0.0)
+            else:
+                # Normalize valid deviations to 0-1 scale
+                uncertainties.append((deviation - min_deviation) / (max_deviation - min_deviation))
 
         uncertainty_array = np.array(uncertainties)
         print(uncertainty_array)
@@ -157,9 +176,11 @@ class HybridVerbalisedSamplingQuantifier:
         # Check if arrays have the same length
         if len(verbalised_results) != len(sampling_results):
             raise ValueError(f"Verbalised results length ({len(verbalised_results)}) does not match sampling results length ({len(sampling_results)})")
-
-        # Calculate the uncertainty
-        uncertainty = alpha * verbalised_results + (1 - alpha) * sampling_results
+        
+        # Calculate the uncertainty, ignoring indices with -1.0 values
+        uncertainty = np.full_like(verbalised_results, -1.0)
+        valid_indices = (verbalised_results != -1.0) & (sampling_results != -1.0)
+        uncertainty[valid_indices] = alpha * verbalised_results[valid_indices] + (1 - alpha) * sampling_results[valid_indices]
 
         # Save the results
         np.save(os.path.join(self.output_dir, 'verbalised_and_sampling_hybrid_uncertainty.npy'), uncertainty)
