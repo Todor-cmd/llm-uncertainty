@@ -1,11 +1,13 @@
 import re
 
-def extract_number_from_text(text):
+def extract_number_from_text(text, bottom_up=False, prefix=None):
     """
     Extract the first number from text, handling various formats.
 
     Args:
         text (str): Text that may contain numbers
+        bottom_up (bool): If True and prefix search fails, search from end of text backwards
+        prefix (str): If provided, look for numbers directly after this prefix first
         
     Returns:
         float: Extracted number, or mark as -1.0 if no number found
@@ -13,24 +15,43 @@ def extract_number_from_text(text):
     # Remove any whitespace and convert to string
     text = str(text).strip()
 
+    # First, try to find number after prefix if provided
+    if prefix is not None:
+        # Look for the prefix followed by optional whitespace and then a number
+        prefix_pattern = re.escape(prefix) + r'\s*(-?\d+(?:\.\d+)?)'
+        prefix_match = re.search(prefix_pattern, text, re.IGNORECASE)
+        if prefix_match:
+            number = float(prefix_match.group(1))
+            if 0 <= number <= 100:
+                return number
+            # If out of range, continue to other methods
+
     # Try to find numbers in the text using regex
     # This pattern matches positive and negative integers and decimals
     number_pattern = r'-?\d+(?:\.\d+)?'
     matches = re.findall(number_pattern, text)
 
     if matches:
-        # Return the first number found
-        number = float(matches[0])
-        if number > 100 or number < 0:
-            # print(f"Warning: Extracted number {number} is out of range, marking inalid as -1.0")
-            return -1.0
-        return number
+        if bottom_up:
+            # Search from the end backwards
+            for match in reversed(matches):
+                number = float(match)
+                if 0 <= number <= 100:
+                    return number
+        else:
+            # Search from the beginning (original behavior)
+            for match in matches:
+                number = float(match)
+                if 0 <= number <= 100:
+                    return number
 
     # If no number found, try to extract digits only (keeping minus sign)
     digits_only = re.sub(r'[^\d.-]', '', text)
     if digits_only and digits_only not in ['.', '-', '.-', '-.']:
         try:
-            return float(digits_only)
+            number = float(digits_only)
+            if 0 <= number <= 100:
+                return number
         except ValueError:
             pass
 
@@ -49,3 +70,9 @@ if __name__ == "__main__":
     print(extract_number_from_text("The number 1 and 52"))
     print(extract_number_from_text("The number is"))
     print(extract_number_from_text("3"))
+    print(extract_number_from_text("The number is 23.45\n score: 3", prefix = "score:"))
+    print(extract_number_from_text("The number is 23.45\n score: 3", bottom_up=True))
+    print(extract_number_from_text("The number is 23.45\n SCORE: 85", prefix = "score:"))
+    print(extract_number_from_text("The number is 23.45\n Score: 75", prefix = "SCORE:"))
+    print(extract_number_from_text("Analysis text 3\nUncertainty Score: 92", prefix = "uncertainty score:"))
+    

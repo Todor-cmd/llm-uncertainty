@@ -3,7 +3,7 @@ import os
 from uncertainty_quantifiers.verbalised_and_sampling import HybridVerbalisedSamplingQuantifier
 from typing import List
 from download_models import get_all_model_dict
-from src.subjecticity_classification import load_models
+from subjecticity_classification import load_models
 
 def run_uncertainty_quantification(
         model_names : dict
@@ -28,7 +28,7 @@ def run_uncertainty_quantification(
 
         model = load_models(model_name, model_init_param)
         hybrid_quantifier = HybridVerbalisedSamplingQuantifier(model, uncertainty_output_dir, inference_results)
-        hybrid_quantifier.calculate_uncertainty()
+        hybrid_quantifier.calculate_uncertainty(alpha=0.9)
 
 if __name__ == "__main__":
     models = get_all_model_dict()

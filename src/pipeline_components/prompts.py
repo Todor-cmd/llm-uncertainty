@@ -29,7 +29,32 @@ personal interpretation, opinion, or bias.
 Subjective sentences express the author's personal views, opinions, interpretations, 
 evaluations, or emotional stance on the topic.
 
-Please, only answer with your score.
+First, analyze your reasoning step by step:
+1. Examine the statement and identify key linguistic features (word choice, tone, factual vs. opinion-based content)
+2. Consider why the proposed answer makes sense or doesn't make sense for this classification
+3. Evaluate potential ambiguities or edge cases that might affect the classification
+4. Reflect on how confident you are in the proposed answer based on your analysis
+
+After your analysis, provide an uncertainty score (0-100).
+IMPORTANT: Always provide your score like in the example below.
+
+Example:
+Statement: "I personally hate everything to do with the colour Red."
+Proposed answer: subjective
+
+Analysis:
+1. The statement contains clear subjective indicators: "I personally" establishes first-person perspective, "hate" is an emotional verb expressing personal feeling, and the statement is about a personal preference rather than factual information.
+2. The proposed answer "subjective" makes perfect sense because this sentence explicitly expresses the author's personal emotional stance and opinion about the color red, which directly aligns with the definition of subjective content.
+3. There are no ambiguities here - the language is unambiguously personal and opinion-based with no factual claims that could be verified independently.
+4. I am highly confident in this classification as the subjective markers are explicit and undeniable.
+
+Uncertainty score: 95
+
+Now analyze the given statement:
+Statement: {sentence}
+Proposed answer: {proposed_answer}
+
+Analysis:
 """
 
 numeric_injection_prompt = """

@@ -4,7 +4,7 @@ import numpy as np
 import json
 from pipeline_components.evaluation import UncertaintyEvaluator
 
-uncertainty_files = ["verbalised_and_sampling_hybrid_uncertainty.npy", "sampling_uncertainty.npy", "verbalised_uncertainty.npy"]
+uncertainty_files = ["verbalised_and_sampling_hybrid_uncertainty.npy", "sample_avg_dev_uncertainty.npy", "verbalised_uncertainty.npy"]
 
 def run_uncertainty_evaluation(
     model_names : List[str] = ["distilgpt2"]
