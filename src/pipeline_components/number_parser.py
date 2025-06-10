@@ -17,16 +17,22 @@ def extract_number_from_text(text, bottom_up=False, prefix=None, prefix_only=Fal
 
     # First, try to find number after prefix if provided
     if prefix is not None:
-        # Look for the prefix followed by optional whitespace and then a number
-        prefix_pattern = re.escape(prefix) + r'\s*(-?\d+(?:\.\d+)?)'
-        prefix_match = re.search(prefix_pattern, text, re.IGNORECASE)
-        if prefix_match:
-            number = float(prefix_match.group(1))
-            if 0 <= number <= 100:
-                return number
-            # If out of range, continue to other methods
-            if prefix_only:
-                return -1.0
+        # Split text into lines and look for prefix in each line
+        for line in text.split('\n'):
+            # Find the prefix in this line (case insensitive)
+            prefix_match = re.search(re.escape(prefix), line, re.IGNORECASE)
+            if prefix_match:
+                # Get the text after the prefix in this line
+                text_after_prefix = line[prefix_match.end():]
+                # Find the first number in the text after the prefix
+                number_match = re.search(r'(\d+(?:\.\d+)?)', text_after_prefix)
+                if number_match:
+                    number = float(number_match.group(1))
+                    if 0 <= number <= 100:
+                        return number
+    # If out of range, continue to other methods
+    if prefix_only:
+        return -1.0
 
     # Try to find numbers in the text using regex
     # This pattern matches positive and negative integers and decimals

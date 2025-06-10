@@ -27,7 +27,7 @@ def run_uncertainty_quantification(
         uncertainty_output_dir = os.path.join(output_dir, "uncertainty_estimates")
 
         model = load_models(model_name, model_init_param)
-        hybrid_quantifier = HybridVerbalisedSamplingQuantifier(model, uncertainty_output_dir, inference_results)
+        hybrid_quantifier = HybridVerbalisedSamplingQuantifier(uncertainty_output_dir, model, inference_results)
         hybrid_quantifier.calculate_uncertainty(alpha=0.9)
 
 if __name__ == "__main__":

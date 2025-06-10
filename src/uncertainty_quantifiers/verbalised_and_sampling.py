@@ -74,7 +74,6 @@ class VerbalisedQuantifier:
             # Extract number from response content and convert to 0-1 scale
             uncertainty_score = extract_number_from_text(
                 response_data["response"], 
-                bottom_up=True, 
                 prefix = "uncertainty score:",
                 prefix_only=True
             )
@@ -150,11 +149,15 @@ class HybridVerbalisedSamplingQuantifier:
     - Quantify uncertainty based on both verbalised and sampling. 0 is least uncertain, 1 is most uncertain
     """
 
-    def __init__(self, model : ModelInferenceInterface, output_dir : str, inference_results : List[dict] = None):
+    def __init__(self, output_dir : str, model : ModelInferenceInterface = None, inference_results : List[dict] = None):
         self.output_dir = output_dir
         self.model = model
-        if inference_results is not None:
+        if inference_results is not None and model is not None:
             self.calc_required_quantifications(inference_results)
+        elif inference_results is not None and model is None:
+            print("Model is required to calculate uncertainty")
+        elif inference_results is None and model is not None:
+            print("Inference results are required to calculate uncertainty")
         
         self.verbalised_results_path = os.path.join(self.output_dir, 'verbalised_uncertainty.npy')
         self.sampling_results_path = os.path.join(self.output_dir, 'sample_avg_dev_uncertainty.npy')
@@ -168,7 +171,7 @@ class HybridVerbalisedSamplingQuantifier:
         sampling_quantifier.calculate_uncertainty()
         verbalised_quantifier.calculate_uncertainty()
 
-    def calculate_uncertainty(self, alpha : float = 0.5):
+    def calculate_uncertainty(self, alpha : float = 0.9):
         # Load the results
         verbalised_results = np.load(self.verbalised_results_path)
         sampling_results = np.load(self.sampling_results_path)
