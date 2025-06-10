@@ -33,11 +33,17 @@ class VerbalisedQuantifier:
         uncertainties = []
         responses = {}
         
+        # Define intermediate file path
+        intermediate_file = os.path.join(self.output_dir, "verbalised_responses_intermediate.json")
+        
         # Use tqdm for progress bar
         time_start = time.time()
-        for sentence, prediction in tqdm(zip(self.sentences, self.predictions), 
+        for idx, (sentence, prediction) in enumerate(tqdm(zip(self.sentences, self.predictions), 
                                        total=len(self.sentences), 
-                                       desc="Calculating uncertainties"):
+                                       desc="Calculating uncertainties")):
+            
+            if idx < 55: # TODO: remove this line later
+                continue
             
             # if prediction is -1.0, skip
             if prediction == -1.0:
@@ -63,12 +69,31 @@ class VerbalisedQuantifier:
                         (str(token), float(prob)) for token, prob in token_probs
                     ],
             }
+
+            # Save intermediate results every 5 samples
+            if (idx + 1) % 5 == 0:
+                try:
+                    with open(intermediate_file, 'w') as f:
+                        json.dump(responses, f, indent=2)
+                    print(f"Updated intermediate results (samples: {idx + 1})")
+                except Exception as e:
+                    print(f"Warning: Failed to save intermediate results: {str(e)}")
+
         time_end = time.time()
         print(f"Time taken: {time_end - time_start} seconds")
 
-        # Save the responses
-        with open(os.path.join(self.output_dir, "verbalised_responses.json"), "w") as f:
-            json.dump(responses, f)
+        # Save the final responses and clean up intermediate file
+        try:
+            with open(os.path.join(self.output_dir, "verbalised_responses.json"), "w") as f:
+                json.dump(responses, f, indent=2)
+            
+            # Clean up intermediate file after successful final save
+            if os.path.exists(intermediate_file):
+                os.remove(intermediate_file)
+                print("Cleaned up intermediate file")
+        except Exception as e:
+            print(f"Error saving final results: {str(e)}")
+            print(f"Intermediate results preserved in {intermediate_file}")
 
         for sentence, response_data in responses.items():
             # Extract number from response content and convert to 0-1 scale

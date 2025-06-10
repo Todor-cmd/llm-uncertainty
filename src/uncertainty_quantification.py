@@ -32,8 +32,8 @@ def run_uncertainty_quantification(
 
 if __name__ == "__main__":
     models = get_all_model_dict()
-    models.pop("openai") # TODO: after testing prompt, remove this line
-    models.pop("Mistral-7B-Instruct-v0.3-GPTQ-4bit") # TODO: after testing prompt, remove this line #350 max tokens
+    models.pop("Meta-Llama-3.1-8B-Instruct-GPTQ-INT4") 
+    models.pop("Mistral-7B-Instruct-v0.3-GPTQ-4bit") 
     run_uncertainty_quantification(models)
     
     
