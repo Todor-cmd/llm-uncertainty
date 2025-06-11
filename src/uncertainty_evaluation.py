@@ -5,7 +5,7 @@ import json
 from pipeline_components.evaluation import UncertaintyEvaluator
 from pipeline_components.number_parser import extract_number_from_text
 
-uncertainty_files = ["entropies.npy"]
+uncertainty_files = ["entropies.npy", "cluster_distances.npy"]
 
 def run_uncertainty_evaluation(
     model_names : List[str] = ["openai"]
@@ -26,7 +26,7 @@ def run_uncertainty_evaluation(
         evaluations = {}
         for uncertainty_file in uncertainty_files:
             uncertainty_path = os.path.join(model_results_dir, "uncertainty_estimates", uncertainty_file)
-            uncertainty_estimates = np.load(uncertainty_path)
+            uncertainty_estimates = np.load(uncertainty_path, allow_pickle=True)
             
             evaluator = UncertaintyEvaluator(predictions, uncertainty_estimates, labels)
             

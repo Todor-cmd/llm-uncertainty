@@ -1,4 +1,5 @@
 import os
+from uncertainty_quantifiers.cluster_distance import ClusterDistanceMetric
 from uncertainty_quantifiers.semantic_entropy import SemanticEntropy
 from typing import List
 
@@ -19,8 +20,11 @@ def run_uncertainty_quantification(
         # as a .npy file where index corresponds to sample index
         uncertainty_output_dir = os.path.join(output_dir, "uncertainty_estimates")
         
-        semantic_uncertainty_quantifier = SemanticEntropy()
-        semantic_uncertainty_quantifier.calculate_uncertainty_from_json(results_path, uncertainty_output_dir)
+        semantic_uncertainty_entropy = SemanticEntropy()
+        semantic_uncertainty_entropy.calculate_uncertainty_from_json(results_path, uncertainty_output_dir)
+
+        semantic_uncertainty_cluster_distance = ClusterDistanceMetric()
+        semantic_uncertainty_cluster_distance.calculate_uncertainty_batch(output_dir=uncertainty_output_dir)
 
 if __name__ == "__main__":
     run_uncertainty_quantification()
