@@ -56,11 +56,3 @@ Proposed answer: {proposed_answer}
 
 Analysis:
 """
-
-numeric_injection_prompt = """
-Inject a numeric value into the following sentence without changing the contents of the sentence:
-
-Sentence: {sentence}
-
-Numeric Injection:
-"""
