@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def generate_semantic_variations(sentence, model_name="gpt-4o-mini", num_variations=10, temperature=0.7):
+def generate_semantic_variation(sentence, model_name="gpt-4o-mini", num_variations=10, temperature=0.7):
     """
     Generate semantically similar variations of a given sentence using an OpenAI model.
     
@@ -62,29 +62,78 @@ Requirements:
     # If we don't have enough variations, try generating more
     if len(variations) < num_variations:
         print(f"Warning: Only generated {len(variations)} variations, trying again...")
-        return generate_semantic_variations(sentence, model_name, num_variations)
+        return generate_semantic_variation(sentence, model_name, num_variations)
     
     print(f"Variations: {variations}")
     return variations[:num_variations]  # Ensure we return exactly num_variations
 
-def run_semantic_variation_classification(
-        models: dict,
+def generate_and_save_all_variations(
         data_path: str = "src/data/test_en_gold.tsv",
         num_samples: int = 100,
         num_variations: int = 10,
         variation_model: str = "gpt-4o-mini",
         temperature: float = 0.7
     ):
+    print(f"Loading data from {data_path}")
+    try:
+        dataloader = create_dataloader(data_path, batch_size=1, shuffle=True)
+        print(f"Successfully loaded data with {len(dataloader.dataset)} samples")
+    except Exception as e:
+        print(f"Failed to load data: {str(e)}")
+        return
+    
+    output_file = "results/sentence_variations.json"
+    all_results = []
+
+    for sample_idx, batch in enumerate(dataloader):
+        if sample_idx >= num_samples:
+            break
+
+        original_sentence = batch['sentence'][0]
+        true_label = batch['label'][0].item()  # Convert tensor to Python int
+        
+        print(f"Processing sample {sample_idx + 1}/{num_samples}: '{original_sentence[:50]}...'")
+        
+        # Generate semantic variations
+        try:
+            variations = generate_semantic_variation(
+                original_sentence,
+                model_name=variation_model,
+                num_variations=num_variations,
+                temperature=temperature
+            )
+        except Exception as e:
+            print(f"Error generating variations: {str(e)}")
+            continue
+        
+        sample_results = {
+            'sample_idx': sample_idx,
+            'original_sentence': original_sentence,
+            'true_label': true_label,
+            'variations': [{'variation_idx': i, 'sentence': v} for i, v in variations]
+        }
+
+        all_results.append(sample_results)
+
+    try:
+        with open(output_file, 'w') as f:
+            json.dump(all_results, f, indent=2)
+        print(f"Saved final results to {output_file}")
+            
+    except Exception as e:
+        print(f"Error saving final results: {str(e)}")
+    
+
+def run_semantic_variation_classification(
+        models: dict,
+        data_path: str = "results/sentence_variations.json"
+    ):
     """
     Run subjectivity classification on original sentences and their semantic variations.
     
     Args:
         models (dict): Dictionary of model names and their initialization parameters
-        data_path (str): Path to the data file
-        num_samples (int): Number of samples to process
-        num_variations (int): Number of variations to generate per sample
-        variation_model (str): Model to use for generating variations
-        temperature (float): Controls randomness in generation (0.0 to 1.0)
+        data_path (str): Path to the data file with variations
     """
     # Step 1: Check which models are available
     print("Checking for model files...")
@@ -100,8 +149,9 @@ def run_semantic_variation_classification(
     # Step 2: Load data and sample
     print(f"Loading data from {data_path}")
     try:
-        dataloader = create_dataloader(data_path, batch_size=1, shuffle=True)
-        print(f"Successfully loaded data with {len(dataloader.dataset)} samples")
+        with open(data_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            print(f"Successfully loaded data with {len(data)} samples")
     except Exception as e:
         print(f"Failed to load data: {str(e)}")
         return
@@ -132,34 +182,10 @@ def run_semantic_variation_classification(
             all_results = []
             
             # Process samples
-            for sample_idx, batch in enumerate(dataloader):
-                if sample_idx >= num_samples:
-                    break
+            for sample in data:
+                sample_results = {}
+                original_sentence = sample['original_sentence']
 
-                original_sentence = batch['sentence'][0]
-                true_label = batch['label'][0].item()  # Convert tensor to Python int
-                
-                print(f"Processing sample {sample_idx + 1}/{num_samples}: '{original_sentence[:50]}...'")
-                
-                # Generate semantic variations
-                try:
-                    variations = generate_semantic_variations(
-                        original_sentence,
-                        model_name=variation_model,
-                        num_variations=num_variations,
-                        temperature=temperature
-                    )
-                except Exception as e:
-                    print(f"Error generating variations: {str(e)}")
-                    continue
-                
-                sample_results = {
-                    'sample_idx': sample_idx,
-                    'original_sentence': original_sentence,
-                    'true_label': true_label,
-                    'variations': []
-                }
-                
                 # Process original sentence
                 try:
                     prompt = subjectivity_classification_prompt.format(sentence=original_sentence)
@@ -176,11 +202,13 @@ def run_semantic_variation_classification(
                     }
                 except Exception as e:
                     print(f"Error processing original sentence: {str(e)}")
+
+                sample_results['variations'] = []
                 
                 # Process variations
-                for var_idx, variation in enumerate(variations):
+                for variation in sample_results:
                     try:
-                        prompt = subjectivity_classification_prompt.format(sentence=variation)
+                        prompt = subjectivity_classification_prompt.format(sentence=variation['sentence'])
                         generated_text, token_probs = wrapper.generate_with_token_probs(
                             prompt, max_new_tokens=20
                         )
@@ -189,8 +217,8 @@ def run_semantic_variation_classification(
                         token_probs_native = [(str(token), float(prob)) for token, prob in token_probs]
                         
                         variation_result = {
-                            'variation_idx': var_idx,
-                            'sentence': variation,
+                            'variation_idx': variation['variation_idx'],
+                            'sentence': variation['sentence'],
                             'generated_text': generated_text,
                             'token_probs': token_probs_native
                         }
@@ -198,17 +226,17 @@ def run_semantic_variation_classification(
                         sample_results['variations'].append(variation_result)
                         
                     except Exception as e:
-                        print(f"Error processing variation {var_idx}: {str(e)}")
+                        print(f"Error processing variation {variation['variation_idx']}: {str(e)}")
                         continue
                 
                 all_results.append(sample_results)
                 
                 # Save intermediate results
-                if (sample_idx + 1) % 10 == 0:
+                if (sample['sample_idx'] + 1) % 10 == 0:
                     try:
                         with open(intermediate_file, 'w') as f:
                             json.dump(all_results, f, indent=2)
-                        print(f"Updated intermediate results (samples: {sample_idx + 1})")
+                        print(f"Updated intermediate results (samples: {sample['sample_idx'] + 1})")
                     except Exception as e:
                         print(f"Warning: Failed to save intermediate results: {str(e)}")
             
@@ -236,16 +264,15 @@ def run_semantic_variation_classification(
 if __name__ == "__main__":
     # Define your local model paths
     models = {
-        "distilgpt2": "src/models/distilgpt2",
-        # "openai": "gpt-4o-mini",
+        # "distilgpt2": "src/models/distilgpt2",
+        "openai": "gpt-4o-mini",
         # Add more models as needed
     }
+
+    # NOTE: If variation generation is needed again uncomment the next line
+    # generate_and_save_all_variations("src/data/test_en_gold.tsv", 100, 10, "gpt-4o-mini", 0.7)
     
     # Run the semantic variation classification
     run_semantic_variation_classification(
-        models=models,
-        num_samples=100,
-        num_variations=10,
-        variation_model="gpt-4o-mini",  # Using GPT4o mini
-        temperature=0.7  # Control randomness in generation
+        models=models
     ) 
