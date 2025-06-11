@@ -25,9 +25,9 @@ class UncertaintyEvaluator:
             uncertainties: Uncertainty estimates for each prediction
             labels: Ground truth labels
         """
-        self.predictions = predictions
-        self.uncertainties = uncertainties
-        self.labels = labels
+        self.predictions = np.array(predictions, dtype=np.int64)
+        self.uncertainties = np.array(uncertainties, dtype=np.float32)
+        self.labels = np.array(labels, dtype=np.int64)
 
     @classmethod
     def from_arrays(cls, predictions: np.ndarray, uncertainties: np.ndarray, labels: np.ndarray):
@@ -73,13 +73,21 @@ class UncertaintyEvaluator:
         Returns:
             dict: Dictionary containing various uncertainty metrics
         """
+        # Add small epsilon to zero uncertainties to avoid assertion errors
+        epsilon = 1e-10  # Small constant to avoid zero standard deviations
+        uncertainties = np.maximum(self.uncertainties, epsilon)
+        
+        # Add small epsilon to predictions and labels to avoid division by zero in MARPD
+        predictions = np.maximum(np.abs(self.predictions), epsilon)
+        labels = np.maximum(np.abs(self.labels), epsilon)
+        
         # Get metrics from uncertainty_toolbox
         # Setting verbose to False from uct.metrics.get_all_metrics
         # as the printing is extensive
         metrics = uct.metrics.get_all_metrics(
-            self.predictions,
-            self.uncertainties,
-            self.labels,
+            predictions,  # Use modified predictions
+            uncertainties,  # Use modified uncertainties
+            labels,  # Use modified labels
             verbose=False  # Set to True if you want uct to print its detailed output
         )
 
@@ -124,6 +132,10 @@ class UncertaintyEvaluator:
             labels = self.labels
             uncertainties = self.uncertainties
 
+        # Normalize uncertainties to [0,1] range
+        if uncertainties.max() > 1.0:
+            uncertainties = (uncertainties - uncertainties.min()) / (uncertainties.max() - uncertainties.min())
+
         return brier_score_loss(labels, uncertainties)
 
     def evaluate(self):
@@ -138,9 +150,22 @@ class UncertaintyEvaluator:
         metrics = {}
 
         metrics['uncertainty_toolbox_metrics'] = self.uncertainty_evaluation_of_std_deviation_prediction()
-        auroc = self.correctness_uncertainty_auroc()
-        # Add auroc to metrics
-        metrics['auroc'] = float(auroc)
+
+        metrics['auroc'] = self.correctness_uncertainty_auroc()
+        metrics['auroc - top 20'] = self.correctness_uncertainty_auroc(top_k=20)
+        metrics['auroc - top 10'] = self.correctness_uncertainty_auroc(top_k=10)
+        metrics['auroc - top 5'] = self.correctness_uncertainty_auroc(top_k=5)
+        metrics['auroc - bottom 20'] = self.correctness_uncertainty_auroc(bottom_k=20)
+        metrics['auroc - bottom 10'] = self.correctness_uncertainty_auroc(bottom_k=10)
+        metrics['auroc - bottom 5'] = self.correctness_uncertainty_auroc(bottom_k=5)
+
+        metrics['brier'] = self.brier_score()
+        metrics['brier - top 20'] = self.brier_score(top_k=20)
+        metrics['brier - top 10'] = self.brier_score(top_k=10)
+        metrics['brier - top 5'] = self.brier_score(top_k=5)
+        metrics['brier - bottom 20'] = self.brier_score(bottom_k=20)
+        metrics['brier - bottom 10'] = self.brier_score(bottom_k=10)
+        metrics['brier - bottom 5'] = self.brier_score(bottom_k=5)
 
         return metrics
 
