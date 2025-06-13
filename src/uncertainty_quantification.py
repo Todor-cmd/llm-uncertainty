@@ -24,7 +24,7 @@ def run_uncertainty_quantification(
             continue
 
         # Step 1: Load inference results
-        with open(results_path, 'r') as f:
+        with open(results_path, 'r', encoding='utf-8') as f:
             inference_results = json.load(f)
 
         if quantifier == QuantifierType.VERBALISED:
@@ -45,11 +45,13 @@ def run_uncertainty_quantification(
             # save predictive entropy results to inference results
             for i, sample in enumerate(inference_results):
                 sample['predictive_entropy'] = predictive_entropy_results[i]
+                sample['predicted_label'] = PredictiveEntropy.fix_predicted_label(sample)
                 # remove the repetitions field to save space
                 sample.pop('repetitions', None)
             # Save updated inference results with predictive entropy to output path
             with open(output_path, 'w') as f:
                 json.dump(inference_results, f, indent=4)
+            print(f"Predictive entropy results saved to {output_path}")
 
         #TODO: Add other quantifiers
 

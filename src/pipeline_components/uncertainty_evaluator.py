@@ -17,11 +17,14 @@ class UncertaintyEvaluator:
         """
         if data_path:
             with open(data_path, 'r') as f:
-                self.data = json.load(f)
+                loaded_data = json.load(f)
         elif data is not None:
-            self.data = data
+            loaded_data = data
         else:
             raise ValueError("Either data_path or data must be provided")
+
+        # Remove entries with predicted_label == -1
+        self.data = [item for item in loaded_data if item.get('predicted_label', None) != -1]
         
         self.setup_arrays()
     
@@ -277,42 +280,62 @@ class UncertaintyEvaluator:
                 f.write(f"    Accuracy gap:          {analysis['accuracy_gap']:.4f}\n")
             
     
-    def plot_analysis(self, results, save_path=None):
-        """Create visualization plots for the analysis"""
-        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    def plot_analysis(self, results, save_dir=None):
+        """Create visualization plots for the analysis and save each to separate files"""
+        if save_dir is None:
+            save_dir = "uncertainty_plots"
+        
+        import os
+        os.makedirs(save_dir, exist_ok=True)
         
         # 1. Calibration plot
+        plt.figure(figsize=(8, 6))
         cal = results['calibration']
-        axes[0, 0].plot([0, 1], [0, 1], 'k--', alpha=0.5, label='Perfect calibration')
-        axes[0, 0].plot(cal['bin_confidences'], cal['bin_accuracies'], 'bo-', label='Model calibration')
-        axes[0, 0].set_xlabel('Mean Predicted Confidence')
-        axes[0, 0].set_ylabel('Fraction of Positives')
-        axes[0, 0].set_title(f'Calibration Plot (ECE={cal["ECE"]:.3f})')
-        axes[0, 0].legend()
-        axes[0, 0].grid(True, alpha=0.3)
+        plt.plot([0, 1], [0, 1], 'k--', alpha=0.5, label='Perfect calibration')
+        plt.plot(cal['bin_confidences'], cal['bin_accuracies'], 'bo-', label='Model calibration')
+        plt.xlabel('Mean Predicted Confidence')
+        plt.ylabel('Fraction of Positives')
+        plt.title(f'Calibration Plot (ECE={cal["ECE"]:.3f})')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        calibration_path = os.path.join(save_dir, 'calibration_plot.png')
+        plt.savefig(calibration_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"Calibration plot saved to {calibration_path}")
         
-        # 2. Uncertainty vs Correctness
+        # 2. Uncertainty vs Correctness (histogram)
+        plt.figure(figsize=(8, 6))
         correct_unc = self.uncertainties[self.correct_predictions == 1]
         incorrect_unc = self.uncertainties[self.correct_predictions == 0]
         
-        axes[0, 1].hist(correct_unc, alpha=0.7, label='Correct', bins=20, density=True)
-        axes[0, 1].hist(incorrect_unc, alpha=0.7, label='Incorrect', bins=20, density=True)
-        axes[0, 1].set_xlabel('Predictive Entropy')
-        axes[0, 1].set_ylabel('Density')
-        axes[0, 1].set_title('Uncertainty Distribution by Correctness')
-        axes[0, 1].legend()
-        axes[0, 1].grid(True, alpha=0.3)
+        plt.hist(correct_unc, alpha=0.7, label='Correct', bins=20, density=True)
+        plt.hist(incorrect_unc, alpha=0.7, label='Incorrect', bins=20, density=True)
+        plt.xlabel('Predictive Entropy')
+        plt.ylabel('Density')
+        plt.title('Uncertainty Distribution by Correctness')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        histogram_path = os.path.join(save_dir, 'uncertainty_distribution.png')
+        plt.savefig(histogram_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"Uncertainty distribution plot saved to {histogram_path}")
         
         # 3. Scatter plot: Uncertainty vs Correctness
+        plt.figure(figsize=(8, 6))
         jitter = np.random.normal(0, 0.02, size=len(self.uncertainties))
-        axes[1, 0].scatter(self.uncertainties, self.correct_predictions + jitter, 
-                          alpha=0.6, s=20)
-        axes[1, 0].set_xlabel('Predictive Entropy')
-        axes[1, 0].set_ylabel('Correct Prediction (with jitter)')
-        axes[1, 0].set_title(f'Uncertainty vs Correctness\n(r={results["correlation"]["pearson_r"]:.3f})')
-        axes[1, 0].grid(True, alpha=0.3)
+        plt.scatter(self.uncertainties, self.correct_predictions + jitter, 
+                alpha=0.6, s=20)
+        plt.xlabel('Predictive Entropy')
+        plt.ylabel('Correct Prediction (with jitter)')
+        plt.title(f'Uncertainty vs Correctness\n(r={results["correlation"]["pearson_r"]:.3f})')
+        plt.grid(True, alpha=0.3)
+        scatter_path = os.path.join(save_dir, 'uncertainty_vs_correctness.png')
+        plt.savefig(scatter_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"Scatter plot saved to {scatter_path}")
         
         # 4. Top-k analysis
+        plt.figure(figsize=(8, 6))
         k_values = []
         acc_gaps = []
         for k, analysis in results['top_k_analysis'].items():
@@ -320,19 +343,17 @@ class UncertaintyEvaluator:
             k_values.append(k_val)
             acc_gaps.append(analysis['accuracy_gap'])
         
-        axes[1, 1].bar(range(len(k_values)), acc_gaps, 
-                      tick_label=[f'Top/Bottom {k}%' for k in k_values])
-        axes[1, 1].set_ylabel('Accuracy Gap (Most - Least Certain)')
-        axes[1, 1].set_title('Performance Gap Analysis')
-        axes[1, 1].grid(True, alpha=0.3)
+        plt.bar(range(len(k_values)), acc_gaps, 
+            tick_label=[f'Top/Bottom {k}%' for k in k_values])
+        plt.ylabel('Accuracy Gap (Most - Least Certain)')
+        plt.title('Performance Gap Analysis')
+        plt.grid(True, alpha=0.3)
+        topk_path = os.path.join(save_dir, 'performance_gap_analysis.png')
+        plt.savefig(topk_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"Performance gap analysis saved to {topk_path}")
         
-        plt.tight_layout()
-        
-        if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"Plots saved to {save_path}")
-        else:
-            plt.show()
+        print(f"All plots saved to directory: {save_dir}")
 
 # Example usage
 def main():

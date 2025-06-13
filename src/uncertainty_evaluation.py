@@ -14,8 +14,8 @@ def run_uncertainty_evaluation(
         uncertainty_evaluator = UncertaintyEvaluator(data_path=data_path)
         results = uncertainty_evaluator.comprehensive_evaluation()
         uncertainty_evaluator.log_summary(results, log_path=os.path.join(model_results_dir, "uncertainty_summary.log"))
-        uncertainty_evaluator.plot_analysis(results, save_path=os.path.join(model_results_dir, "uncertainty_analysis.png"))
+        uncertainty_evaluator.plot_analysis(results, save_dir=os.path.join(model_results_dir, "plots"))
 
 
 if __name__ == "__main__":
-    run_uncertainty_evaluation()
+    run_uncertainty_evaluation(model_names=["openai", "meta-llama", "mistralai"])

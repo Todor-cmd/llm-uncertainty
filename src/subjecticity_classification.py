@@ -9,6 +9,8 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
+import argparse
+
 def run_subjectivity_classification(
         models : dict,
         data_path : str = "src/data/test_en_gold.tsv",
@@ -93,7 +95,7 @@ def run_subjectivity_classification(
                         # Generate response
                         rep_start = time.time()
                         generated_text, token_probs = wrapper.generate_with_token_probs(
-                            prompt, max_new_tokens=20
+                            prompt, max_new_tokens=2
                         )
                         rep_end = time.time()
 
@@ -201,15 +203,30 @@ def get_average_prediction_binary_prompt(repetitions : list) -> str:
         return "ambiguous"  # In case of a tie
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run subjectivity classification for a specific model.")
+    parser.add_argument("--model_name", type=str, required=True, help="Name of the model to use (must match key in models dict)")
+    parser.add_argument("--samples_limit", type=int, default=100, help="Number of samples to process")
+    parser.add_argument("--binary_classification", action="store_true", help="Use binary classification prompt")
+    args = parser.parse_args()
+
     # Define your local model paths
     models = {
-        # "distilgpt2": "models/distilgpt2",
-        "openai": "gpt-4o-mini",
+        "distilgpt2": "/scratch/bchristensen/models/distilgpt2",
         # Add more models as needed
-        # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-        # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
+        "openai": "gpt-4o-mini",
+        "meta-llama": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
+        "mistralai": "/scratch/bchristensen/models/Mistral-7B-Instruct-v0.2",
     }
-    
-    # Run the subjectivity classification
-    run_subjectivity_classification(models=models, samples_limit=2, binary_classification=True)
+
+    # Only run for the specified model
+    if args.model_name not in models:
+        print(f"Model '{args.model_name}' not found in models dict.")
+        exit(1)
+    selected_models = {args.model_name: models[args.model_name]}
+
+    run_subjectivity_classification(
+        models=selected_models,
+        samples_limit=args.samples_limit,
+        binary_classification=args.binary_classification
+    )
     
