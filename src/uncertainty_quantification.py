@@ -3,14 +3,13 @@ import os
 from uncertainty_quantifiers.verbalised_and_sampling import HybridVerbalisedSamplingQuantifier
 from typing import List
 from uncertainty_quantifiers.predictive_entropy import PredictiveEntropy
+import argparse
 
-class QuantifierType:
-    VERBALISED = "verbalised"
-    PREDICTIVE_ENTROPY = "predictive_entropy"
+from subjectivity_classification import QuantifierType
 
 def run_uncertainty_quantification(
         model_names : List[str] = ["openai"],
-        quantifier: str = QuantifierType.VERBALISED,
+        quantifier_type: str = QuantifierType.VERBALISED,
     ):
 
     for model_name in model_names:
@@ -27,35 +26,48 @@ def run_uncertainty_quantification(
         with open(results_path, 'r', encoding='utf-8') as f:
             inference_results = json.load(f)
 
-        if quantifier == QuantifierType.VERBALISED:
+        if quantifier_type == QuantifierType.VERBALISED:
             # Step 2: Run uncertainty quantification which should save results to output_dir
             # as a .npy file where index corresponds to sample index
             uncertainty_output_dir = os.path.join(output_dir, "uncertainty_estimates")
             hybrid_quantifier = HybridVerbalisedSamplingQuantifier(uncertainty_output_dir, inference_results)
             hybrid_quantifier.calculate_uncertainty()
-        elif quantifier == QuantifierType.PREDICTIVE_ENTROPY:
-            # Step 2: Run predictive entropy quantification
-            # Create an instance of the PredictiveEntropy quantifier
-            # and calculate uncertainty, then save results to output_path
+
+        elif quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
+
             output_path = os.path.join(output_dir, "uncertainty_estimates.json")
             predictive_entropy_quantifier = PredictiveEntropy()
-            # Calculate predictive entropy
             predictive_entropy_results = predictive_entropy_quantifier.calculate_uncertainty(inference_results)
 
-            # save predictive entropy results to inference results
             for i, sample in enumerate(inference_results):
                 sample['predictive_entropy'] = predictive_entropy_results[i]
                 sample['predicted_label'] = PredictiveEntropy.fix_predicted_label(sample)
                 # remove the repetitions field to save space
                 sample.pop('repetitions', None)
-            # Save updated inference results with predictive entropy to output path
+
             with open(output_path, 'w') as f:
                 json.dump(inference_results, f, indent=4)
             print(f"Predictive entropy results saved to {output_path}")
 
-        #TODO: Add other quantifiers
 
 if __name__ == "__main__":
-    run_uncertainty_quantification(quantifier=QuantifierType.PREDICTIVE_ENTROPY, model_names=["openai"])
+    parser = argparse.ArgumentParser(description="Run uncertainty quantification for subjectivity classification.")
+    parser.add_argument(
+        "--quantifier_type",
+        type=str,
+        choices=[QuantifierType.VERBALISED, QuantifierType.PREDICTIVE_ENTROPY],
+        default=QuantifierType.VERBALISED,
+        help="Type of uncertainty quantification to run."
+    )
+    parser.add_argument(
+        "--model_names",
+        type=str,
+        nargs='+',
+        default=["openai"],
+        help="List of model names to run uncertainty quantification for."
+    )
+    args = parser.parse_args()
+
+    run_uncertainty_quantification(quantifier_type=args.quantifier_type, model_names=args.model_names)
     
     
