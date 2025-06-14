@@ -6,7 +6,7 @@ from sklearn.metrics import roc_auc_score, f1_score
 from sklearn.calibration import calibration_curve
 import seaborn as sns
 
-class UncertaintyEvaluator:
+class UncertaintyEvaluatorEntropy:
     def __init__(self, data_path=None, data=None):
         """
         Initialize evaluator with data from file path or directly

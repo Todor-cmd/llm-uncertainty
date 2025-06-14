@@ -2,7 +2,7 @@ from typing import List
 import os
 import numpy as np
 import json
-from pipeline_components.uncertainty_evaluator import UncertaintyEvaluator
+from pipeline_components.uncertainty_evaluator_entropy import UncertaintyEvaluatorEntropy
 from subjectivity_classification import QuantifierType
 import argparse
 
@@ -16,7 +16,7 @@ def run_uncertainty_evaluation(
         if quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
             data_path = os.path.join(model_results_dir, "uncertainty_estimates.json")
 
-            uncertainty_evaluator = UncertaintyEvaluator(data_path=data_path)
+            uncertainty_evaluator = UncertaintyEvaluatorEntropy(data_path=data_path)
             results = uncertainty_evaluator.comprehensive_evaluation()
             uncertainty_evaluator.log_summary(results, log_path=os.path.join(model_results_dir, "uncertainty_summary.log"))
             uncertainty_evaluator.plot_analysis(results, save_dir=os.path.join(model_results_dir, "plots"))
