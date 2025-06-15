@@ -1,0 +1,33 @@
+
+============================================================
+UNCERTAINTY EVALUATION SUMMARY
+============================================================
+
+ CALIBRATION & SHARPNESS:
+  Expected Calibration Error (ECE): 0.1633
+  Maximum Calibration Error (MCE):  0.6943
+  Sharpness (confidence variance):  0.2154
+
+ AUROC ANALYSIS:
+  AUROC (uncertainty predicting errors): 0.7291
+  Correct predictions: 46
+  Incorrect predictions: 53
+
+ ERROR-UNCERTAINTY CORRELATION:
+  Pearson correlation:  0.3952 (p=0.0001)
+  Spearman correlation: 0.4075 (p=0.0000)
+  Kendall's tau:        0.3514 (p=0.0001)
+
+ TOP-K / BOTTOM-K ANALYSIS:
+  TOP_10_BOTTOM_10:
+    Most certain accuracy:  0.7105
+    Least certain accuracy: 0.1000
+    Accuracy gap:          0.6105
+  TOP_20_BOTTOM_20:
+    Most certain accuracy:  0.7105
+    Least certain accuracy: 0.1500
+    Accuracy gap:          0.5605
+  TOP_30_BOTTOM_30:
+    Most certain accuracy:  0.7105
+    Least certain accuracy: 0.2667
+    Accuracy gap:          0.4439

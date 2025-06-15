@@ -1,6 +1,6 @@
 from pipeline_components.data_loader import create_dataloader
 from pipeline_components.model_inference import ModelInferenceInterface, check_model_build_requirements, LocalModelInference, OpenAIModelInference
-from pipeline_components.prompts import subjectivity_classification_prompt
+from pipeline_components.prompts import subjectivity_classification_prompt, subjectivity_classification_binary_prompt, subjectivity_uncertainty_score_prompt, numeric_injection_prompt
 from pipeline_components.number_parser import extract_number_from_text
 import os
 import json
@@ -9,11 +9,18 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
+import argparse
+
+class QuantifierType:
+    VERBALISED = "verbalised"
+    PREDICTIVE_ENTROPY = "predictive_entropy"
+
 def run_subjectivity_classification(
         models : dict,
         data_path : str = "src/data/test_en_gold.tsv",
         sample_repetitions : int = 10,
-        samples_limit : int = 100
+        samples_limit : int = 100,
+        quantifier_type: str = QuantifierType.VERBALISED,
     ):
 
     # Step 1: Check which models are available
@@ -84,14 +91,20 @@ def run_subjectivity_classification(
                 for rep in tqdm(range(sample_repetitions), desc="Running repetitions"):
                     try:
                         # Create prompt for subjectivity classification
-                        prompt = subjectivity_classification_prompt.format(sentence=sentence)
+                        if quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
+                            prompt = subjectivity_classification_binary_prompt.format(sentence=sentence)
+                            max_new_tokens = 2 # we need only 2 tokens as it's either or "subjective", "subject" & "ive" and vice versa for objective
+                        else:
+                            prompt = subjectivity_classification_prompt.format(sentence=sentence)
+                            max_new_tokens = 20
                         
                         # Generate response
                         rep_start = time.time()
                         generated_text, token_probs = wrapper.generate_with_token_probs(
-                            prompt, max_new_tokens=20
+                            prompt, max_new_tokens=max_new_tokens
                         )
                         rep_end = time.time()
+
                         
                         repetition_result = {
                             'repetition': int(rep),
@@ -109,7 +122,10 @@ def run_subjectivity_classification(
                         print(f"Error in inference for repetition {rep}: {str(e)}")
                         continue
                 
-                avg_prediction = get_average_prediction_numeric_prompt(sample_results['repetitions'])
+                if quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
+                    avg_prediction = get_average_prediction_binary_prompt(sample_results['repetitions'])
+                else:
+                    avg_prediction = get_average_prediction_numeric_prompt(sample_results['repetitions'])
                 sample_results['predicted_label'] = avg_prediction
                 all_results.append(sample_results)
                 
@@ -176,17 +192,53 @@ def get_average_prediction_numeric_prompt(repetitions : list) -> float:
         return 1
     else:
         return 0
+    
+def get_average_prediction_binary_prompt(repetitions : list) -> str:
+    # convert predictions to subjective or objective
+    predictions = [repetition['generated_text'].strip().lower() for repetition in repetitions]
+    
+    # Count occurrences of each class
+    subjective_count = predictions.count("subjective")
+    objective_count = predictions.count("objective")
+    
+    if subjective_count > objective_count:
+        return "subjective"
+    elif objective_count > subjective_count:
+        return "objective"
+    else:
+        return "ambiguous"  # In case of a tie
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run subjectivity classification for a specific model.")
+    parser.add_argument("--model_name", type=str, required=True, help="Name of the model to use (must match key in models dict)")
+    parser.add_argument("--samples_limit", type=int, default=100, help="Number of samples to process")
+    parser.add_argument(
+        "--quantifier_type",
+        type=str,
+        choices=[QuantifierType.VERBALISED, QuantifierType.PREDICTIVE_ENTROPY],
+        default=QuantifierType.VERBALISED,
+        help="Type of quantifier to use for subjectivity classification"
+    )
+    args = parser.parse_args()
+
     # Define your local model paths
     models = {
-        # "distilgpt2": "models/distilgpt2",
-        "openai": "gpt-4o-mini",
+        # "distilgpt2": "/scratch/bchristensen/models/distilgpt2",
         # Add more models as needed
-        # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-        # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
+        "openai": "gpt-4o-mini",
+        # "meta-llama": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
+        # "mistralai": "/scratch/bchristensen/models/Mistral-7B-Instruct-v0.2",
     }
-    
-    # Run the subjectivity classification
-    run_subjectivity_classification(models=models, samples_limit=1)
+
+    # Only run for the specified model
+    if args.model_name not in models:
+        print(f"Model '{args.model_name}' not found in models dict.")
+        exit(1)
+    selected_models = {args.model_name: models[args.model_name]}
+
+    run_subjectivity_classification(
+        models=selected_models,
+        samples_limit=args.samples_limit,
+        quantifier_type=args.quantifier_type
+    )
     

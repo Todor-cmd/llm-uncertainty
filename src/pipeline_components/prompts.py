@@ -12,6 +12,23 @@ Subjective sentences express the author's personal views, opinions, interpretati
 Please respond with only the numeric score (0-100).
 """
 
+subjectivity_classification_binary_prompt = """
+Your task is to classify sentence as either subjective or objective.
+- If the sentence expresses the subjective view of the author, classify it as "subjective".
+- If the sentence presents an objective view on the topic, classify it as "objective".
+Please respond with only the word "subjective" or "objective".
+
+Example:
+Sentence: "The new policy is a disaster for the economy."
+Response: "subjective"
+Sentence: "The new policy was implemented on January 1st."
+Response: "objective"
+
+For the following sentence, please provide your classification:
+Sentence: {sentence}
+Response: 
+"""
+
 subjectivity_uncertainty_score_prompt = """
 Statement: {sentence}
 Proposed answer: {proposed_answer}
