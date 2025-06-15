@@ -270,8 +270,8 @@ if __name__ == "__main__":
     models = {
         # "distilgpt2": "src/models/distilgpt2",
         # "openai": "gpt-4o-mini",
-        "mistralai": "",
-        "meta-llama": ""
+        "mistralai": "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit",
+        "meta-llama": "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4"
         # Add more models as needed
     }
 

@@ -69,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--quantifier_type",
         type=str,
-        choices=[QuantifierType.VERBALISED, QuantifierType.PREDICTIVE_ENTROPY],
+        choices=[QuantifierType.VERBALISED, QuantifierType.PREDICTIVE_ENTROPY, QuantifierType.SEMANTIC_ENTROPY],
         default=QuantifierType.VERBALISED,
         help="Type of uncertainty quantification to run."
     )
