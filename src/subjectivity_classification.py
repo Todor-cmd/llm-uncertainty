@@ -9,12 +9,18 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
+import argparse
+
+class QuantifierType:
+    VERBALISED = "verbalised"
+    PREDICTIVE_ENTROPY = "predictive_entropy"
+
 def run_subjectivity_classification(
         models : dict,
         data_path : str = "src/data/test_en_gold.tsv",
         sample_repetitions : int = 10,
         samples_limit : int = 100,
-        binary_classification : bool = False
+        quantifier_type: str = QuantifierType.VERBALISED,
     ):
 
     # Step 1: Check which models are available
@@ -85,15 +91,17 @@ def run_subjectivity_classification(
                 for rep in tqdm(range(sample_repetitions), desc="Running repetitions"):
                     try:
                         # Create prompt for subjectivity classification
-                        if binary_classification:
+                        if quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
                             prompt = subjectivity_classification_binary_prompt.format(sentence=sentence)
+                            max_new_tokens = 2 # we need only 2 tokens as it's either or "subjective", "subject" & "ive" and vice versa for objective
                         else:
                             prompt = subjectivity_classification_prompt.format(sentence=sentence)
+                            max_new_tokens = 20
                         
                         # Generate response
                         rep_start = time.time()
                         generated_text, token_probs = wrapper.generate_with_token_probs(
-                            prompt, max_new_tokens=20
+                            prompt, max_new_tokens=max_new_tokens
                         )
                         rep_end = time.time()
 
@@ -114,7 +122,7 @@ def run_subjectivity_classification(
                         print(f"Error in inference for repetition {rep}: {str(e)}")
                         continue
                 
-                if binary_classification:
+                if quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
                     avg_prediction = get_average_prediction_binary_prompt(sample_results['repetitions'])
                 else:
                     avg_prediction = get_average_prediction_numeric_prompt(sample_results['repetitions'])
@@ -201,15 +209,36 @@ def get_average_prediction_binary_prompt(repetitions : list) -> str:
         return "ambiguous"  # In case of a tie
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run subjectivity classification for a specific model.")
+    parser.add_argument("--model_name", type=str, required=True, help="Name of the model to use (must match key in models dict)")
+    parser.add_argument("--samples_limit", type=int, default=100, help="Number of samples to process")
+    parser.add_argument(
+        "--quantifier_type",
+        type=str,
+        choices=[QuantifierType.VERBALISED, QuantifierType.PREDICTIVE_ENTROPY],
+        default=QuantifierType.VERBALISED,
+        help="Type of quantifier to use for subjectivity classification"
+    )
+    args = parser.parse_args()
+
     # Define your local model paths
     models = {
-        # "distilgpt2": "models/distilgpt2",
-        "openai": "gpt-4o-mini",
+        # "distilgpt2": "/scratch/bchristensen/models/distilgpt2",
         # Add more models as needed
-        # "meta-llama/Llama-3.1-8B": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
-        # "mistralai/Mistral-7B": "./models/mistralai/Mistral-7B-Instruct-v0.2",
+        "openai": "gpt-4o-mini",
+        # "meta-llama": "/scratch/bchristensen/models/Llama-3.1-8B-Instruct",
+        # "mistralai": "/scratch/bchristensen/models/Mistral-7B-Instruct-v0.2",
     }
-    
-    # Run the subjectivity classification
-    run_subjectivity_classification(models=models, samples_limit=10, binary_classification=False)
+
+    # Only run for the specified model
+    if args.model_name not in models:
+        print(f"Model '{args.model_name}' not found in models dict.")
+        exit(1)
+    selected_models = {args.model_name: models[args.model_name]}
+
+    run_subjectivity_classification(
+        models=selected_models,
+        samples_limit=args.samples_limit,
+        quantifier_type=args.quantifier_type
+    )
     

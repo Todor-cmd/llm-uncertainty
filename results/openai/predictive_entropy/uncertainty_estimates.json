@@ -1,0 +1,702 @@
+[
+    {
+        "sample_idx": 0,
+        "sentence": "Blanco established himself earlier in his career working for Dr. Luke's Kasz Money Productions.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 3.370258001620631e-06
+    },
+    {
+        "sample_idx": 1,
+        "sentence": "RULE 13: ARTIFICIAL INTELLIGENCE  Not only this, but Gina also created an AI model of herself to achieve immortality.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.011970706963118995
+    },
+    {
+        "sample_idx": 2,
+        "sentence": "The valuation is required by law and the figure is assessed independently by a pension specialist and has been reviewed by the National Audit Office.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 5.354258620967161e-06
+    },
+    {
+        "sample_idx": 3,
+        "sentence": "A sip can really hit the spot after a long bike ride or a walk.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 4,
+        "sentence": "Lobster!\"",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.3570028844173796
+    },
+    {
+        "sample_idx": 5,
+        "sentence": "But this is precisely the reason why Labour must reject the austerian urges that, inevitably, spring from the credit card analogy.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 6,
+        "sentence": "Googled how to cook a good lobster and I read how hard it is to get it good because it can turn very tough, rubbery.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 7.11191524827876e-06
+    },
+    {
+        "sample_idx": 7,
+        "sentence": "Apartments cost from \u00a3392 per week to rent, which makes it more expensive than an average room in first-year halls (a single room without bathroom typically costs \u00a3250 per week) but more affordable than a lot of the postgraduate accommodation on offer.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.819297679425773e-06
+    },
+    {
+        "sample_idx": 8,
+        "sentence": "We apologise to TikTok for not approaching it for comment prior to publication.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 2.3114706903318118e-05
+    },
+    {
+        "sample_idx": 9,
+        "sentence": "Crumbling parliament patched up with a few fig leaves  Parliament gained some new residents yesterday, and there are already questions as to their expenses.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 0.13698532190279158
+    },
+    {
+        "sample_idx": 10,
+        "sentence": "In 2019, he bagged a role in the ensemble movie Berlin, I Love You - which was labelled a 'empty, boring flop' by The Observer.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.42922160843055457
+    },
+    {
+        "sample_idx": 11,
+        "sentence": "By the way, she is honestly the best cook.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 12,
+        "sentence": "Families are doubling down on calls for perpetrators to be brought to justice, and say changes on the handling of femicide cases are necessary.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.1104423099240122
+    },
+    {
+        "sample_idx": 13,
+        "sentence": "Anything we can actually do, we can afford.\u201d Britain\u2019s conundrum, today, is that the next government, whose job will be to fix the Tories\u2019 mess, is led by politicians who share neither Keynes\u2019s aims nor his innovative approach to public finance.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 2.537184737695224e-06
+    },
+    {
+        "sample_idx": 14,
+        "sentence": "\u201cI just believe in being the best version of myself that I can possibly be, it makes me feel good.\u201d  Read more real life stories  Not only does Gina swear by hydration - but she also has 13 other rules she sticks to like glue.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 15,
+        "sentence": "\u201cRussia\u2019s dominance in the Black Sea is now challenged.\u201d  The Boxing Day blast saw Vlad's valuable landing ship - docked in Crimea - turned into a raging fireball.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.40662719479439186
+    },
+    {
+        "sample_idx": 16,
+        "sentence": "Sea drones & anti-ship missiles  The February 1 attack came after Ukraine unveiled its new underwater robot drone, a stealth Autonomous Underwater Vehicle (AUV).",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.1672934690516205e-06
+    },
+    {
+        "sample_idx": 17,
+        "sentence": "\u201cThey\u2019re people who appreciate the onsite facilities such as the restaurant and gym and see living around older people as a lifestyle benefit rather than a hindrance,\u201d she explains.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 9.521235148235105e-06
+    },
+    {
+        "sample_idx": 18,
+        "sentence": "But none of this means that the ditched \u00a328bn policy was optimal or, indeed, that an incoming chancellor can safely commit the Treasury to borrow and spend unlimited amounts.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 0.34563040854231314
+    },
+    {
+        "sample_idx": 19,
+        "sentence": "The record, which topped out at 41 on the Billboard 200, included contributions from Bieber, Halsey, Calvin Harris, Omar Apollo and Gracie Abrams.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 5.531713475626178e-06
+    },
+    {
+        "sample_idx": 20,
+        "sentence": "The journalist Mike Smith was struck yesterday when he noticed",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.069802541406873
+    },
+    {
+        "sample_idx": 21,
+        "sentence": "Two years later, he stepped into a leading man role once again when he appeared in The Other Me - about a architect who has an eye disease which enables him to see people's real motives.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 6.588323949743838e-06
+    },
+    {
+        "sample_idx": 22,
+        "sentence": "At the time, Time magazine dubbed the film 'disjoined' - saying that 'characters that Nicholls brought so cunningly to life in the book feel rushed through a timeline, tied to an agenda'.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.3191924336184085
+    },
+    {
+        "sample_idx": 23,
+        "sentence": "\u201cWe were in shock,\u201d says Wangari\u2019s father.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 6.127827948034092e-06
+    },
+    {
+        "sample_idx": 24,
+        "sentence": "House Democrats and the remaining pro-Ukraine House Republicans are casting about behind the scenes for a solution.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 7.978428971415719e-06
+    },
+    {
+        "sample_idx": 25,
+        "sentence": "Austerity, and the credit card analogy that provides its thin veneer of logic, is not just bad for workers and people in desperate need of state support during tough times; it also depresses investment.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 26,
+        "sentence": "In a pre-dawn vote on Tuesday, Graham joined the majority of Senate Republicans in opposing a foreign aid package that would rush wartime assistance to Ukraine as it approaches the second anniversary of Russia\u2019s full invasion.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.819297764762496e-06
+    },
+    {
+        "sample_idx": 27,
+        "sentence": "The Observer's Philip French dubbed it 'thin, superficial and sentimental' and said the casting of Anne Hathway was 'disastrous'.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 28,
+        "sentence": "A third commented: \"$20 for $6k - not bad!\"",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 5.951697091573818e-06
+    },
+    {
+        "sample_idx": 29,
+        "sentence": "The plan incorporates cash payments supplemented by contingent contributions.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.998066871065138e-06
+    },
+    {
+        "sample_idx": 30,
+        "sentence": "It is true that the Tories will leave scorched earth behind for the next government, with a budget dripping in red ink and a pitiful level of investment in the technologies and services the UK needs to escape a long-term slump.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 31,
+        "sentence": "A WOMAN who has been dubbed \u2018the world\u2019s hottest gran\u2019 has revealed how she stays looking eternally young at the age of 53.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.5838424533353611
+    },
+    {
+        "sample_idx": 32,
+        "sentence": "Couldn't say everything I wanted to in the video.\"",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 8.150877417033059e-06
+    },
+    {
+        "sample_idx": 33,
+        "sentence": "From the Senate floor, Senator Mitch McConnell, the top Republican, delivered increasingly urgent pleas for his conference to rise to the occasion and support America\u2019s allies, even after his plan to tie border security to foreign aid collapsed, torpedoed by Trump\u2019s opposition.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 7.285810850400806e-06
+    },
+    {
+        "sample_idx": 34,
+        "sentence": "The Hollywood Reporter was particularly gushing of Jim Sturgess' performance - saying the actor had 'staked his claim as the new Hugh Grant only without the fussy mannerisms'.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 1.8045692411076653e-06
+    },
+    {
+        "sample_idx": 35,
+        "sentence": "The Neptune \"super missile\", revealed in August last year, was reportedly snatched from behind enemy lines during a raid on Putin's prized \u00a3200million air defence system.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 1.2219928069499073e-05
+    },
+    {
+        "sample_idx": 36,
+        "sentence": "- Actor was on track to become a Hollywood star when he appeared in One Day  - Read More: How Taylor Swift's savvy marketing executive mother Andrea turned her daughter into a superstar  David Nicholls' romantic novel One Day became an overnight fan favourite when it was first released in 2009 and is now being rediscovered by a new audience thanks to Netflix's adaptation.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 0.001718219485467327
+    },
+    {
+        "sample_idx": 37,
+        "sentence": "\"$6k is a lot of money,\" wrote one.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 38,
+        "sentence": "He told The Independent in 2021: 'If someone does a bad one, I can\u2019t watch the film.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.00029344314517890335
+    },
+    {
+        "sample_idx": 39,
+        "sentence": "Gina Stewart has previously hit the headlines for her youthful appearance and most recently, immortalising herself as an AI model.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.0005088677994679564
+    },
+    {
+        "sample_idx": 40,
+        "sentence": "Anne is a very warm actress.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 41,
+        "sentence": "And I was good at it.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 42,
+        "sentence": "\u201cOn matters like femicide which society takes lightly, you don\u2019t just get justice,\u201d says Kamande.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 43,
+        "sentence": "hosted by Laura Rangeley and Michael Deakin).",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 2.0237876919937214e-05
+    },
+    {
+        "sample_idx": 44,
+        "sentence": "Following One Day, the actor was dubbed the 'new Hugh Grant'  Pictured: Jim Sturgess - who is now a musician - opposite David Jason in A Touch of Frost in March 2003  Speaking to The Telegraph at the time, Jim - who starred in the Beatles-inspired movie Across the Universe beforehand - admitted that he hadn't read the book when he had his first audition.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 8.494972223535658e-06
+    },
+    {
+        "sample_idx": 45,
+        "sentence": "He has collaborated with a bevy of big name artists - including Gomez herself, on tracks such as 2023's Single Soon, and his 2019 song I Can\u2019t Get Enough.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.998066871065138e-06
+    },
+    {
+        "sample_idx": 46,
+        "sentence": "RULE 4: MOISTURISE  Gina uses organic coconut oil every day on her body, as she admitted \"I have moisturised my entire body every day since I was 19.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.01089509242067356
+    },
+    {
+        "sample_idx": 47,
+        "sentence": "It\u2019s this second group that Barratt is targeting for Ayrton House \u2013 final year medical students and graduate trainees from the surrounding universities, which include Westminster, Middlesex and UCL.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.998066871065138e-06
+    },
+    {
+        "sample_idx": 48,
+        "sentence": "This is why the more Osborne slashed public spending in the 2010s, the more money he needed to borrow.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.037579173771409874
+    },
+    {
+        "sample_idx": 49,
+        "sentence": "When your credit card is \u201cmaxed out\u201d, you do indeed need immediately to tighten your belt.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 50,
+        "sentence": "This was inaccurate.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 3.508011999632294e-06
+    },
+    {
+        "sample_idx": 51,
+        "sentence": "She now has her 26-year-old granddaughter, Eliza Brunero, lodging with her on Wednesdays each week.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.998066871065138e-06
+    },
+    {
+        "sample_idx": 52,
+        "sentence": "Wangari is one of 16 Kenyan women who have died allegedly at the hands of their partners since the start of 2024.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.998066871065138e-06
+    },
+    {
+        "sample_idx": 53,
+        "sentence": "And the Caesar Kunikov's watery demise is just the latest blow to have embarrassed Putin.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 54,
+        "sentence": "Beks then shared a clip of what happened straight after and continues: \"It was my lunch break and I just dipped out and didn't tell anybody.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.011475405271080756
+    },
+    {
+        "sample_idx": 55,
+        "sentence": "I know you was heartbroken lol.\"",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 2.1609118793994e-06
+    },
+    {
+        "sample_idx": 56,
+        "sentence": "\u201cI can\u2019t say I add anything to her life but she certainly brightens up mine.\u201d  Brunero begs to differ.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 57,
+        "sentence": "But while Leo Woodall is enjoying a career boost for his portrayal as 'pampered Southern toff' Dexter Mayhew, the 2011 film adaptation had the exact opposite effect for actor Jim Sturgess.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.05209749431742993
+    },
+    {
+        "sample_idx": 58,
+        "sentence": "I scribbled down what I saw and what I felt and the song kind of wrote itself.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 59,
+        "sentence": "In the first image, the Emmy-nominated actress embraced Blanco, who has a passion for cooking, while he was preparing a platter of meatballs.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 6.237586364735765e-06
+    },
+    {
+        "sample_idx": 60,
+        "sentence": "It follows their range of Unmanned Surface Vehicles (USVs) which have been hugely successful in Black Sea attacks.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 0.018336242816955266
+    },
+    {
+        "sample_idx": 61,
+        "sentence": "But one person who knows exactly what's that like after getting the winning number on a scratchcard has told how they were left bitterly \"disappointed.\"",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 62,
+        "sentence": "Selena looked chic in a brown turtleneck, with her hair brushed back into a ponytail, while her other half rocked a white tee, and gold chains.",
+        "true_label": 1,
+        "predicted_label": -1,
+        "predictive_entropy": 0.6922270467002895
+    },
+    {
+        "sample_idx": 63,
+        "sentence": "The refreshing beer-and-fizzy-pop combination bubbled away as a quietly constant \u2013 if not cult \u2013 pub choice for over half my lifetime, then seemed to fizzle out over the past 15 years.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 64,
+        "sentence": "Kyiv continues to target Russia\u2019s Black Sea Fleet with great effectDr Bastian Giegerich, IISS security analyst  And Vlad's Black Sea fleet was \"put on the defensive by several events\", which included the sea drone attack in December that \"badly damaged a landing ship off Novorossiysk\".",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 9.180110220766879e-06
+    },
+    {
+        "sample_idx": 65,
+        "sentence": "\u201cIt\u2019s such a bonus \u2013 sometimes I cook for her, sometimes she cooks for me, we play cards, we watch TV and we chat,\u201d Hamilton says.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 6.237586364430649e-06
+    },
+    {
+        "sample_idx": 66,
+        "sentence": "She was fairly close to Wangari, and recalls with sadness how she had promised to send her money the following week so she could move to a new flat.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 67,
+        "sentence": "And it could even be used to gather intelligence on Russian operations.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 1.6513031371042333e-05
+    },
+    {
+        "sample_idx": 68,
+        "sentence": "\"I'm not really a gambler - it was a $10k (\u00a37.9k) a week for life scratch card and I scratched it off.\"",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.00037054676530338487
+    },
+    {
+        "sample_idx": 69,
+        "sentence": "When it was an Emma and Dex day I felt good about it.'",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 70,
+        "sentence": "RULE 10: BE HAPPY  She then advised: \u201cLike the song don\u2019t worry be happy and create a life of meaningful memories.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 71,
+        "sentence": "But perhaps most impressively, Ukrainian forces managed to blow up Russia's flagship vessel - the Moskva - in April 2022.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 1.2887142841753524e-05
+    },
+    {
+        "sample_idx": 72,
+        "sentence": "But Michelle evidently didn't hold the blunder against him; the couple have been married since 2015 after meeting in late 2012.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 6.937707862175612e-06
+    },
+    {
+        "sample_idx": 73,
+        "sentence": "Vigils, dubbed \u201cDark Valentine\u201d, were held across Kenya this week after a month in which more than a dozen women have been killed, allegedly by their partners.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.819297722149646e-06
+    },
+    {
+        "sample_idx": 74,
+        "sentence": "The radio presenter revealed the Fool Me Once star rumbled his porky pies the next day and fumed: 'Mark, you're a liar!'",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 3.0711978915167363e-06
+    },
+    {
+        "sample_idx": 75,
+        "sentence": "The snap comes after Selena surprised fans on Monday with a very racy photo of Benny grabbing her cleavage  Gomez has been linked with Blanco, a musical artist, producer, and songwriter, since last year  In the first image from the post, the Emmy-nominated actress embraced Blanco, who has a passion for cooking, while he was preparing a platter of meatballs  Blanco was posed behind Gomez as they relaxed in the kitchen area of a home alongside friends including The Bear actor Matty Matheson  On Sunday, the couple was seen kissing one another while posed against a velvet red couch in a shot Gomez posted to Instagram  Gomez and Blanco have frequently shared their light-hearted and romantic moments via Instagram in the early days of their relationship.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 0.00041383649463022057
+    },
+    {
+        "sample_idx": 76,
+        "sentence": "November 17, 2023  Sir, your article \u2018BBC crisis over \u00a31.7bn pension bill for stars\u2019 (4/11/2023) is incorrect and significantly inflates the BBC\u2019s obligation to fund its defined benefit pension scheme shortfall and employer contribution rate.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 0.02725205372937447
+    },
+    {
+        "sample_idx": 77,
+        "sentence": "The crime currently falls under homicide provisions, which rights groups say do not account for the unequal power relations between men and women that drive and characterise the killings.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.0033844746165753643
+    },
+    {
+        "sample_idx": 78,
+        "sentence": "Fr\u00fch Natur Radler  2.5%; The Real Ale Store, \u00a31.85 for 500ml; Hop Burns & Black, \u00a32.30  If grapefruit is not your bag, seek out this lemony-fresh delight from Fr\u00fch.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 79,
+        "sentence": "Following on from this, Jim went on to star in the 2012 adaptation of David Mitchell's Cloud Atlas, which also divided audiences.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.07974370948582007
+    },
+    {
+        "sample_idx": 80,
+        "sentence": "Limit your spending and you have limited your income too.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 0.086872992684594
+    },
+    {
+        "sample_idx": 81,
+        "sentence": "Unlike some of the other lemon offerings out there, this isn\u2019t soapy at all and has a very natural lemon flavouring.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 82,
+        "sentence": "Blanco was past rumored to be in a romance with Elsie Hewitt, a 27-year-old model-actress from London (who has since been linked with Jason Sudeikis, 48).",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 1.5202474500271768e-05
+    },
+    {
+        "sample_idx": 83,
+        "sentence": "The Schedule of Contributions agreed with the Scheme Trustee as part of the 2022 actuarial valuation states that the employer contribution rate for the defined benefit pension scheme is currently set to 30% of members\u2019 pensionable salaries.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 5.885413567897563e-06
+    },
+    {
+        "sample_idx": 84,
+        "sentence": "So I wanted more.'",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 1.345504881612387e-06
+    },
+    {
+        "sample_idx": 85,
+        "sentence": "Nearly half of Republicans and right-leaning independents said the US was providing too much aid to Ukraine, according to a survey by the Pew Research Center conducted late last year.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 4.998066871065138e-06
+    },
+    {
+        "sample_idx": 86,
+        "sentence": "Meanwhile, some arch-conservatives suggested it was time for McConnell to step down.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": 0.003957518050201603
+    },
+    {
+        "sample_idx": 87,
+        "sentence": "\u201cI maintain a healthy weight that preserves my facial structure and collagen.\u201d",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 88,
+        "sentence": "Later in a campaign speech, Trump rattled American allies in Europe when he claimed that he would encourage Russia to attack Nato allies who did not pay enough to maintain the security alliance.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 9.691453711183501e-06
+    },
+    {
+        "sample_idx": 89,
+        "sentence": "Mark made the cheeky confession on-air while hosting his Heart FM radio programme on Monday, admitting he got 'clocked' by Michelle when she found the restaurant takeaway bag in the bin.",
+        "true_label": 1,
+        "predicted_label": 0,
+        "predictive_entropy": 8.838035603340082e-06
+    },
+    {
+        "sample_idx": 90,
+        "sentence": "\u201cIt has my facial expressions \u2013 my eyes, lips, hair, arms, legs, chest and butt, all dimples and textures fully integrated.\u201d  Fabulous will pay for your exclusive stories.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 0.00020606673358648906
+    },
+    {
+        "sample_idx": 91,
+        "sentence": "Since the 2022 valuation, funding has improved.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 7.805704691184373e-06
+    },
+    {
+        "sample_idx": 92,
+        "sentence": "He said: 'At a very young age, the local theatre in my town went to local schools to cast a load of kids to be in a professional production of Wind In The Willows.",
+        "true_label": 0,
+        "predicted_label": 0,
+        "predictive_entropy": 0.0002499388539373417
+    },
+    {
+        "sample_idx": 93,
+        "sentence": "RULE 9: LOVE  According to Gina, you should love yourself, love your life, love others.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 94,
+        "sentence": "Anne Hathaway is not it.",
+        "true_label": 1,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 95,
+        "sentence": "As she watches her granddaughters play, Wairimu wonders if things could have played out differently.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 96,
+        "sentence": "RULE 5: ATTITUDE IS EVERYTHING  Gina stressed the importance of \"thinking yourself young\" as she suggested: \"You are what you think.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 97,
+        "sentence": "However, Variety wasn't so gushing - and said the drama 'should have stayed in quarantine'.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    },
+    {
+        "sample_idx": 98,
+        "sentence": "The Ohio senator JD Vance, another Trump loyalist, claimed the effort to replenish Ukraine\u2019s war chest was a \u201cplot\u201d by the Republican establishment to \u201cstop the election of Donald Trump\u201d.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": 2.6074462634437517e-06
+    },
+    {
+        "sample_idx": 99,
+        "sentence": "It\u2019s made me realise how much we take older people for granted.\u201d  Both Brunero and Hamilton can see how mutually beneficial a multigenerational community such as Ayrton House could be.",
+        "true_label": 0,
+        "predicted_label": 1,
+        "predictive_entropy": -1.000088900581841e-12
+    }
+]

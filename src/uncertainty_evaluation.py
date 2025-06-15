@@ -2,39 +2,45 @@ from typing import List
 import os
 import numpy as np
 import json
-from pipeline_components.evaluation import UncertaintyEvaluator
-
-uncertainty_files = ["verbalised_and_sampling_hybrid_uncertainty.npy", "sampling_uncertainty.npy", "verbalised_uncertainty.npy"]
+from pipeline_components.uncertainty_evaluator_entropy import UncertaintyEvaluatorEntropy
+from subjectivity_classification import QuantifierType
+import argparse
 
 def run_uncertainty_evaluation(
-    model_names : List[str] = ["distilgpt2"]
+    model_names : List[str] = ["openai"],
+    quantifier_type: str = QuantifierType.PREDICTIVE_ENTROPY
 ):
     for model_name in model_names:
         model_results_dir = os.path.join("results", model_name)
-        
-        # Step 0: Load predictions and labels
-        subjectivity_results_path = os.path.join(model_results_dir, "subjectivity_classification.json")
-        with open(subjectivity_results_path, 'r') as f:
-            subjectivity_results = json.load(f)
-        
-        predictions = [result['predicted_label'] for result in subjectivity_results]
-        labels = [result['true_label'] for result in subjectivity_results]
-        
-        # Step 1: Load uncertainty estimates and evaluate them
-        evaluations = {}
-        for uncertainty_file in uncertainty_files:
-            uncertainty_path = os.path.join(model_results_dir, "uncertainty_estimates", uncertainty_file)
-            uncertainty_estimates = np.load(uncertainty_path)
-            
-            evaluator = UncertaintyEvaluator(predictions, uncertainty_estimates, labels)
-            #TODO: I think this might have to get different metrics for the uncertainty types
-            results = evaluator.evaluate() 
-            evaluations[uncertainty_file] = results
-        
-        # Step 2: Save evaluations
-        evaluations_path = os.path.join(model_results_dir, "evaluations.json")
-        with open(evaluations_path, 'w') as f:
-            json.dump(evaluations, f, indent=4)
+
+        if quantifier_type == QuantifierType.PREDICTIVE_ENTROPY:
+            data_path = os.path.join(model_results_dir, "uncertainty_estimates.json")
+
+            uncertainty_evaluator = UncertaintyEvaluatorEntropy(data_path=data_path)
+            results = uncertainty_evaluator.comprehensive_evaluation()
+            uncertainty_evaluator.log_summary(results, log_path=os.path.join(model_results_dir, "uncertainty_summary.log"))
+            uncertainty_evaluator.plot_analysis(results, save_dir=os.path.join(model_results_dir, "plots"))
+        else:
+            ## TODO: add the evaluation logic for verbalised
+            pass
+
 
 if __name__ == "__main__":
-    run_uncertainty_evaluation()
+    parser = argparse.ArgumentParser(description="Run uncertainty quantification for subjectivity classification.")
+    parser.add_argument(
+        "--quantifier_type",
+        type=str,
+        choices=[QuantifierType.VERBALISED, QuantifierType.PREDICTIVE_ENTROPY],
+        default=QuantifierType.VERBALISED,
+        help="Type of uncertainty quantification to run."
+    )
+    parser.add_argument(
+        "--model_names",
+        type=str,
+        nargs='+',
+        default=["openai"],
+        help="List of model names to run uncertainty quantification for."
+    )
+    args = parser.parse_args()
+
+    run_uncertainty_evaluation(model_names=args.model_names, quantifier_type=args.quantifier_type)
