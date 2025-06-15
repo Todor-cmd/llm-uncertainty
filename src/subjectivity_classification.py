@@ -14,6 +14,7 @@ import argparse
 class QuantifierType:
     VERBALISED = "verbalised"
     PREDICTIVE_ENTROPY = "predictive_entropy"
+    SEMANTIC_ENTROPY = "semantic_entropy"
 
 def run_subjectivity_classification(
         models : dict,

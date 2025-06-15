@@ -126,7 +126,8 @@ def generate_and_save_all_variations(
 
 def run_semantic_variation_classification(
         models: dict,
-        data_path: str = "results/sentence_variations.json"
+        data_path: str = "results/sentence_variations.json",
+        local: bool = False
     ):
     """
     Run subjectivity classification on original sentences and their semantic variations.
@@ -163,7 +164,7 @@ def run_semantic_variation_classification(
         print(f"{'='*60}")
         
         # Create model-specific output directory
-        output_dir = Path(os.path.join("results", model_name))
+        output_dir = Path(os.path.join("results", model_name, "semantic_entropy"))
         output_dir.mkdir(parents=True, exist_ok=True)
         
         # Define file paths
@@ -174,7 +175,10 @@ def run_semantic_variation_classification(
             # Load model
             print("Loading model...")
             load_start = time.time()
-            wrapper = OpenAIModelInference(model_init_param)
+            if local:
+                wrapper = LocalModelInference(model_init_param)
+            else:
+                wrapper = OpenAIModelInference(model_init_param)
             load_end = time.time()
             print(f"Model load time: {load_end - load_start:.2f} seconds")
             
@@ -265,7 +269,9 @@ if __name__ == "__main__":
     # Define your local model paths
     models = {
         # "distilgpt2": "src/models/distilgpt2",
-        "openai": "gpt-4o-mini",
+        # "openai": "gpt-4o-mini",
+        "mistralai": "",
+        "meta-llama": ""
         # Add more models as needed
     }
 
@@ -274,5 +280,6 @@ if __name__ == "__main__":
     
     # Run the semantic variation classification
     run_semantic_variation_classification(
-        models=models
+        models=models,
+        local=True
     ) 
