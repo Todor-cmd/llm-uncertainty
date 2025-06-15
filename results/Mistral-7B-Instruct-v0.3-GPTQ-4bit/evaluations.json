@@ -1,10 +1,10 @@
 {
     "verbalised_and_sampling_hybrid_uncertainty": {
-        "confidence_correctness_auprc": 0.7483951515954729,
-        "error_detection_auprc": 0.340136338226709,
-        "confidence_accuracy_correlation": 0.03580253117578661,
-        "expected_calibration_error": 0.1710049621387151,
-        "brier_score": 0.2412175510510156
+        "confidence_correctness_auprc": 0.8145845430785064,
+        "error_detection_auprc": 0.3409265915381655,
+        "confidence_accuracy_correlation": 0.15197939308647793,
+        "expected_calibration_error": 0.19691697575961936,
+        "brier_score": 0.26195812608427294
     },
     "sample_avg_dev_uncertainty": {
         "confidence_correctness_auprc": 0.811469248618559,

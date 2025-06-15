@@ -208,7 +208,7 @@ class HybridVerbalisedSamplingQuantifier:
         # Calculate the uncertainty, ignoring indices with -1.0 values
         uncertainty = np.full_like(verbalised_results, -1.0)
         valid_indices = (verbalised_results != -1.0) & (sampling_results != -1.0)
-        uncertainty[valid_indices] = alpha * verbalised_results[valid_indices] + (1 - alpha) * sampling_results[valid_indices]
+        uncertainty[valid_indices] = (1 - alpha) * verbalised_results[valid_indices] + alpha * sampling_results[valid_indices]
 
         # Save the results
         np.save(os.path.join(self.output_dir, 'verbalised_and_sampling_hybrid_uncertainty.npy'), uncertainty)
