@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import roc_auc_score, brier_score_loss, average_precision_score
+from sklearn.metrics import brier_score_loss, average_precision_score, f1_score, precision_recall_curve
 from sklearn.calibration import calibration_curve
 
 class UncertaintyEvaluator:
@@ -23,14 +23,7 @@ class UncertaintyEvaluator:
     @classmethod
     def from_arrays(cls, predictions: np.ndarray, confidences: np.ndarray, labels: np.ndarray):
         return cls(predictions, confidences, labels)
-
-    def _auroc_score(self, y_true, y_score):
-        """Helper to compute AUROC and handle edge cases."""
-        try:
-            return float(roc_auc_score(y_true, y_score))
-        except ValueError:
-            # Handle case where all labels are the same class
-            return np.nan
+    
 
     def _expected_calibration_error(self, n_bins=10):
         """Calculate Expected Calibration Error."""
@@ -70,15 +63,13 @@ class UncertaintyEvaluator:
         """
         metrics = {
             # Discrimination metrics (how well confidence separates correct/incorrect)
-            'confidence_correctness_auroc': self._auroc_score(self.is_correct, self.confidences),
             'confidence_correctness_auprc': float(average_precision_score(self.is_correct, self.confidences)),
-            'error_detection_auroc': self._auroc_score(self.is_incorrect, 1 - self.confidences),
+            'error_detection_auprc': float(average_precision_score(self.is_incorrect, 1 - self.confidences)),  
+            'confidence_accuracy_correlation': float(np.corrcoef(self.confidences, self.is_correct)[0, 1]),
             
             # Calibration metrics (how well confidence matches actual accuracy)
             'expected_calibration_error': self._expected_calibration_error(),
             'brier_score': float(brier_score_loss(self.is_correct, self.confidences)),
-            
-            'confidence_accuracy_correlation': float(np.corrcoef(self.confidences, self.is_correct)[0, 1]),
         }
         
         return metrics
